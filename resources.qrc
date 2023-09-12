@@ -1,0 +1,17 @@
+<!DOCTYPE RCC><RCC version="1.0">
+    <qresource>
+        <file>pieces-png/white-bishop.png</file>
+        <file>pieces-png/white-king.png</file>
+        <file>pieces-png/white-knight.png</file>
+        <file>pieces-png/white-pawn.png</file>
+        <file>pieces-png/white-queen.png</file>
+        <file>pieces-png/white-rook.png</file>
+        <file>pieces-png/black-bishop.png</file>
+        <file>pieces-png/black-king.png</file>
+        <file>pieces-png/black-knight.png</file>
+        <file>pieces-png/black-pawn.png</file>
+        <file>pieces-png/black-queen.png</file>
+        <file>pieces-png/black-rook.png</file>
+        <!-- Add more resource files as needed -->
+    </qresource>
+</RCC>
