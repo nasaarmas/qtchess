@@ -14,7 +14,7 @@ class ChessBoard : public QWidget
 Q_OBJECT
 
 public:
-    ChessBoard(QWidget *parent = nullptr);
+    explicit ChessBoard(QWidget *parent = nullptr);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
