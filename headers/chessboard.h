@@ -7,7 +7,7 @@
 
 #include <QWidget>
 #include <QAbstractGraphicsShapeItem>
-
+#include "pawnmodel.h"
 
 class ChessBoard : public QWidget
 {
@@ -15,12 +15,15 @@ Q_OBJECT
 
 public:
     explicit ChessBoard(QWidget *parent = nullptr);
+    void printPawn(PawnModel* pawn);
+    ~ChessBoard() override;
 
 protected:
     void paintEvent(QPaintEvent *event) override;
-    void printPawns();
+
 
 private:
+    PawnModel *pPawnToBeDrawn;
     // Define any private variables or methods you may need.
 };
 

@@ -5,5 +5,7 @@
 #include "../headers/pawnmodel.h"
 
 PawnModel::PawnModel(BoardPosition pwnBPosition, QString imagePath) {
+    this->pwnBPosition = pwnBPosition;
+    this->imagePath = imagePath;
 
 }

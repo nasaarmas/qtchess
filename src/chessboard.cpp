@@ -3,14 +3,15 @@
 //
 
 #include "../headers/chessboard.h"
+#include "../headers/pawnmodel.h"
 #include <QPainter>
 #include <QApplication>
 #include <QBrush>
-#include <QDebug>
 
 
 ChessBoard::ChessBoard(QWidget *parent) : QWidget(parent) {
     setFixedSize(1300, 700);
+    pPawnToBeDrawn = nullptr;
     // Initialize any variables or setup required for your chessboard.
 }
 
@@ -45,20 +46,30 @@ void ChessBoard::paintEvent(QPaintEvent *event) {
                          QChar(row + 65));
     }
 
-    QPixmap pawnWhite(":/pieces-png/white-pawn.png"); // Replace with your file path
+
     QPixmap pawnBlack(":/pieces-png/black-pawn.png"); // Replace with your file path
-
-    // Resize the pawn images (adjust the size as needed)
     int pawnSize = 50;
-    pawnWhite = pawnWhite.scaled(pawnSize, pawnSize);
     pawnBlack = pawnBlack.scaled(pawnSize, pawnSize);
-
-    // Draw the resized pawn images at specific positions
-    // For example, drawing a white pawn at (100, 100)
-    painter.drawPixmap(250, 200, pawnWhite);
     painter.drawPixmap(200, 200, pawnBlack);
+
+    if (this->pPawnToBeDrawn != nullptr) {
+
+        QPixmap pawnWhite(QString(":/" + this->pPawnToBeDrawn->imagePath)); // Replace with your file path
+        pawnWhite = pawnWhite.scaled(pawnSize, pawnSize);
+        painter.drawPixmap(lftBrdPadding + 50 * (this->pPawnToBeDrawn->pwnBPosition.posX - 1),
+                           topBrdPadding + 50 * (this->pPawnToBeDrawn->pwnBPosition.posY - 1), pawnWhite);
+        delete pPawnToBeDrawn;
+        pPawnToBeDrawn = nullptr;
+
+    }
 }
 
-void ChessBoard::printPawns() {
-
+void ChessBoard::printPawn(PawnModel *pawn) {
+    this->pPawnToBeDrawn = new PawnModel(*pawn);
+    update();
 }
+
+ChessBoard::~ChessBoard(){
+    delete pPawnToBeDrawn;
+}
+

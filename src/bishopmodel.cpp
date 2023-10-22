@@ -4,5 +4,5 @@
 
 #include "../headers/bishopmodel.h"
 
-BishopModel::BishopModel(BoardPosition pwnBPosition, QString imagePath) : PawnModel(pwnBPosition, imagePath){};
+BishopModel::BishopModel(BoardPosition pwnBPosition, QString imagePath) : PawnModel(pwnBPosition, imagePath) {};
 
