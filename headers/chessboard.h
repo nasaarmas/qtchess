@@ -17,14 +17,16 @@ Q_OBJECT
 public:
     explicit ChessBoard(QWidget *parent = nullptr);
     static void printPawn(PawnModel* pawn, QPainter& painter);
+    void updatePieces(QList<PawnModel*> currentPieces);
     ~ChessBoard() override;
+
 
 protected:
     void paintEvent(QPaintEvent *event) override;
 
 private:
-    static void initializePieces(QList<PawnModel *>& allPieces);
     QList<PawnModel*> pieces;
+    int fontSize, lftBrdPadding, topBrdPadding, cellSize;
 
 };
 
