@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
     chessboard.show();
     BoardPosition bishopBrdPos{3, 1};
     auto *bishopPawn = new BishopModel(bishopBrdPos, "pieces-png/black-bishop.png");
-    chessboard.printPawn(bishopPawn);
+
     delete bishopPawn;
     return QApplication::exec();
 }

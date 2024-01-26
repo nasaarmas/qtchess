@@ -1,21 +1,24 @@
-//
-// Created by Bartek on 9/9/2023.
-//
-
 #ifndef QTCHESS_PJC_CHESSBOARD_H
 #define QTCHESS_PJC_CHESSBOARD_H
 
 #include <QWidget>
 #include <QAbstractGraphicsShapeItem>
 #include "pawnmodel.h"
-
+#include "bishopmodel.h"
+#include "rookmodel.h"
+#include "knightmodel.h"
+#include "queenmodel.h"
+#include "kingmodel.h"
+#include <QList>
 class ChessBoard : public QWidget
 {
 Q_OBJECT
 
 public:
     explicit ChessBoard(QWidget *parent = nullptr);
-    void printPawn(PawnModel* pawn);
+    static void printPawn(PawnModel* pawn, QPainter& painter);
+    static void initializePieces(QList<PawnModel *>& allPieces);
+    QList<PawnModel*> pieces;
     ~ChessBoard() override;
 
 protected:
@@ -23,7 +26,7 @@ protected:
 
 
 private:
-    PawnModel *pPawnToBeDrawn;
+    //PawnModel *pPawnToBeDrawn;
     // Define any private variables or methods you may need.
 };
 

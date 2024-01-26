@@ -15,6 +15,13 @@ find_package(Qt5 COMPONENTS
         REQUIRED)
 
 add_executable(qtchess_pjc main.cpp headers/chessboard.h src/chessboard.cpp headers/pawnmodel.h src/pawnmodel.cpp resources.qrc src/boardposition.cpp headers/boardposition.h headers/bishopmodel.h src/bishopmodel.cpp
+        src/rookmodel.cpp
+        headers/rookmodel.h
+        src/knightmodel.cpp
+        headers/queenmodel.h
+        src/queenmodel.cpp
+        headers/kingmodel.h
+        src/kingmodel.cpp
 )
 target_link_libraries(qtchess_pjc
         Qt5::Core

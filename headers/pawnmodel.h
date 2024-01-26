@@ -11,7 +11,8 @@
 class PawnModel {
 
 public:
-    PawnModel(BoardPosition pwnBPosition, QString imagePath);
+    PawnModel(BoardPosition pwnBPosition, QString imagePath, bool isWhite=true, bool isAlive=true);
+    virtual void movePiece();
     BoardPosition pwnBPosition;
     QString imagePath;
     bool isWhite;

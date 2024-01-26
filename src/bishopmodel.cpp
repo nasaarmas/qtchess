@@ -1,8 +1,8 @@
-//
-// Created by Bartek on 9/10/2023.
-//
-
 #include "../headers/bishopmodel.h"
 
-BishopModel::BishopModel(BoardPosition pwnBPosition, QString imagePath) : PawnModel(pwnBPosition, imagePath) {};
+BishopModel::BishopModel(BoardPosition pwnBPosition, QString imagePath, bool isWhite, bool isAlive) : PawnModel(
+        pwnBPosition, imagePath, isWhite, isAlive) {};
 
+void BishopModel::movePiece() {
+
+}

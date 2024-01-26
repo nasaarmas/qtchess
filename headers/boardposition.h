@@ -1,7 +1,3 @@
-//
-// Created by Bartek on 9/10/2023.
-//
-
 #ifndef QTCHESS_PJC_BOARDPOSITION_H
 #define QTCHESS_PJC_BOARDPOSITION_H
 
