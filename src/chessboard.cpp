@@ -1,7 +1,3 @@
-//
-// Created by Bartek on 9/9/2023.
-//
-
 #include "../headers/chessboard.h"
 
 #include <QPainter>
@@ -12,9 +8,8 @@
 
 ChessBoard::ChessBoard(QWidget *parent) : QWidget(parent) {
     setFixedSize(1300, 700);
-    //pPawnToBeDrawn = nullptr;
     initializePieces(this->pieces);
-    // Initialize any variables or setup required for your chessboard.
+
 }
 
 void ChessBoard::paintEvent(QPaintEvent *event) {
@@ -78,7 +73,6 @@ ChessBoard::~ChessBoard() {
     for (PawnModel *piece: this->pieces) {
         delete piece;
     }
-
     // Clear the list
     pieces.clear();
 }

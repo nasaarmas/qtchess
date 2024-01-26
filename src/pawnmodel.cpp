@@ -1,11 +1,9 @@
 #include "../headers/pawnmodel.h"
+#include <QDebug>
+#include <utility>
 
-PawnModel::PawnModel(BoardPosition pwnBPosition, QString imagePath, bool isWhite, bool isAlive) {
-    this->pwnBPosition = pwnBPosition;
-    this->imagePath = imagePath;
-    this->isWhite = isWhite;
-    this->isAlive = isAlive;
-}
+PawnModel::PawnModel(BoardPosition pwnBPosition, QString imagePath, bool isWhite, bool isAlive) :
+        pwnBPosition(pwnBPosition), imagePath(std::move(imagePath)), isWhite(isWhite), isAlive(isAlive) {}
 
 void PawnModel::movePiece() {
 

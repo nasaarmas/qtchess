@@ -9,9 +9,5 @@ int main(int argc, char *argv[]) {
     ChessBoard chessboard;
 
     chessboard.show();
-    BoardPosition bishopBrdPos{3, 1};
-    auto *bishopPawn = new BishopModel(bishopBrdPos, "pieces-png/black-bishop.png");
-
-    delete bishopPawn;
     return QApplication::exec();
 }

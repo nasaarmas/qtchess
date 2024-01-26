@@ -1,7 +1,3 @@
-//
-// Created by Bartek on 9/9/2023.
-//
-
 #ifndef QTCHESS_PJC_PAWNMODEL_H
 #define QTCHESS_PJC_PAWNMODEL_H
 
