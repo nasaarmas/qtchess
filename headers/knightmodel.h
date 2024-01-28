@@ -1,16 +1,13 @@
-//
-// Created by Bartek on 26-Jan-24.
-//
-
 #ifndef QTCHESS_PJC_KNIGHTMODEL_H
 #define QTCHESS_PJC_KNIGHTMODEL_H
 
 #include "pawnmodel.h"
+#include <QList>
 
 class KnightModel : public PawnModel{
 public:
-    KnightModel(BoardPosition pwnBPosition, QString imagePath, bool isWhite=true, bool isAlive=true);
-    void movePiece() override;
+    KnightModel(BoardPosition pwnBPosition, QString imagePath, bool isWhite=true);
+    void PossibleMoves(QVector<BoardPosition> *moveVector, const QList<PawnModel *>& pieces) override;
 };
 
 

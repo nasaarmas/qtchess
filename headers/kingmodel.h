@@ -1,13 +1,14 @@
 #ifndef QTCHESS_PJC_KINGMODEL_H
 #define QTCHESS_PJC_KINGMODEL_H
 
+#include <QList>
 #include "pawnmodel.h"
 
 class KingModel : public PawnModel {
 public:
-    KingModel(BoardPosition pwnBPosition, QString imagePath, bool isWhite = true, bool isAlive = true);
+    KingModel(BoardPosition pwnBPosition, QString imagePath, bool isWhite = true);
 
-    void movePiece() override;
+    void PossibleMoves(QVector<BoardPosition> *moveVector, const QList<PawnModel *>& pieces) override;
 };
 
 

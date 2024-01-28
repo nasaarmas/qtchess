@@ -1,28 +1,26 @@
-//
-// Created by Bartek on 9/9/2023.
-//
-
 #include "../headers/chessboard.h"
-
+#include "../headers/chessgame.h"
 #include <QPainter>
 #include <QApplication>
 #include <QBrush>
-//#include <QDebug>
+#include <utility>
 
 
-ChessBoard::ChessBoard(QWidget *parent) : QWidget(parent) {
+ChessBoard::ChessBoard(QWidget *parent, int fontSize, int lftBrdPadding, int topBrdPadding, int cellSize) : QWidget(
+        parent), fontSize(fontSize) {
     setFixedSize(1300, 700);
-    //pPawnToBeDrawn = nullptr;
-    initializePieces(this->pieces);
-    // Initialize any variables or setup required for your chessboard.
+    this->fontSize = fontSize;
+    this->lftBrdPadding = lftBrdPadding;
+    this->topBrdPadding = topBrdPadding;
+    this->cellSize = cellSize;
+    moveCircles = {};
 }
 
-void ChessBoard::paintEvent(QPaintEvent *event) {
-    Q_UNUSED(event);
+void ChessBoard::paintEvent(QPaintEvent *) {
     QPainter painter(this);
     painter.fillRect(rect(), QColor{44, 75, 107});
 
-    auto fontSize{14}, lftBrdPadding{200}, topBrdPadding{150}, cellSize{50};
+
     painter.setFont(QFont("Times New Roman", fontSize));
     auto lightColor = QColor{146, 172, 172};
     auto darkColor = QColor{115, 115, 115};
@@ -35,124 +33,76 @@ void ChessBoard::paintEvent(QPaintEvent *event) {
             painter.setPen(Qt::black);
             painter.drawRect(cellRect);
             painter.setPen(Qt::white);
+            auto columnNumberPlace = int{row * cellSize + topBrdPadding + (cellSize + fontSize) / 2};
             if (row == col) {
-                painter.drawText(lftBrdPadding - fontSize - 6,
-                                 row * cellSize + topBrdPadding + (cellSize + fontSize) / 2, QString::number(8 - row));
-                painter.drawText(8 * cellSize + lftBrdPadding + 6,
-                                 row * cellSize + topBrdPadding + (cellSize + fontSize) / 2, QString::number(8 - row));
+                painter.drawText(lftBrdPadding - fontSize - 6, columnNumberPlace, QString::number(8 - row));
+                painter.drawText(8 * cellSize + lftBrdPadding + 6, columnNumberPlace, QString::number(8 - row));
             }
         }
-        painter.drawText(row * cellSize + lftBrdPadding + (cellSize - fontSize) / 2, topBrdPadding - 6,
-                         QChar(row + 65));
-        painter.drawText(row * cellSize + lftBrdPadding + (cellSize - fontSize) / 2,
-                         8 * cellSize + topBrdPadding + fontSize + 8,
-                         QChar(row + 65));
+        auto rowLetterPlace = int{row * cellSize + lftBrdPadding + (cellSize - fontSize) / 2};
+        painter.drawText(rowLetterPlace, topBrdPadding - 6, QChar(row + 65));
+        painter.drawText(rowLetterPlace, 8 * cellSize + topBrdPadding + fontSize + 8, QChar(row + 65));
     }
 
-    for (PawnModel *piece: pieces) {
-        if (piece != nullptr) {
-            ChessBoard::printPawn(piece, painter);
+    for (auto moveCell: moveCircles) {
+        painter.setBrush(Qt::red);
+        painter.drawEllipse(lftBrdPadding + cellSize * moveCell.posX + 3,
+                            topBrdPadding + 350 - cellSize * moveCell.posY + 3, cellSize - 6, cellSize - 6);
+    }
+
+    for (auto *piece: pieces) {
+        ChessBoard::printPawn(piece, painter);
+    }
+    auto whichWhiteDead{0}, whichBlackDead{0};
+    for (auto *piece: deadPiecesToDraw) {
+        auto pawnToBeDrawn = QPixmap{QString(piece->imagePath)};
+        auto pawnSize = int{60};
+        pawnToBeDrawn = pawnToBeDrawn.scaled(pawnSize, pawnSize);
+        if(piece->isWhite) {
+            painter.drawPixmap(lftBrdPadding + cellSize * whichWhiteDead, topBrdPadding + 450, pawnToBeDrawn);
+            whichWhiteDead++;
+        }
+        if(!piece->isWhite) {
+            painter.drawPixmap(lftBrdPadding + cellSize * whichBlackDead, 50, pawnToBeDrawn);
+            whichBlackDead++;
         }
     }
 
     auto clickableBlock = QRect(800, 250, 150, 50);
-    painter.fillRect(clickableBlock, QColor(110, 46, 19));  // Red color, you can change it
-
-    // Draw text inside the clickable block
+    painter.fillRect(clickableBlock, QColor(110, 46, 19));
     painter.setPen(Qt::white);
     painter.drawText(clickableBlock, Qt::AlignCenter, "Click me!");
-
-
 }
 
 void ChessBoard::printPawn(PawnModel *pawn, QPainter &painter) {
-    auto lftBrdPadding{195}, topBrdPadding{144};
+    //auto lftBrdPadding{195}, topBrdPadding{144};
     auto pawnToBeDrawn = QPixmap{QString(pawn->imagePath)};
-    auto pawnSize{60};
+    auto pawnSize = int{60};
     pawnToBeDrawn = pawnToBeDrawn.scaled(pawnSize, pawnSize);
-    painter.drawPixmap(lftBrdPadding + 50 * (pawn->pwnBPosition.posX - 1),
-                       topBrdPadding + 400 - 50 * (pawn->pwnBPosition.posY), pawnToBeDrawn);
+    painter.drawPixmap(195 + 50 * (pawn->pwnBPosition.posX),
+                       144 + 350 - 50 * (pawn->pwnBPosition.posY), pawnToBeDrawn);
 }
+
+
+void ChessBoard::mousePressEvent(QMouseEvent *event) {
+    emit mouseClicked(event->x(), event->y());
+}
+
 
 ChessBoard::~ChessBoard() {
-    for (PawnModel *piece: this->pieces) {
-        delete piece;
-    }
-
-    // Clear the list
     pieces.clear();
+    deadPiecesToDraw.clear();
 }
 
-void ChessBoard::initializePieces(QList<PawnModel *> &allPieces) {
-    auto piecePosistion = BoardPosition{1, 1};
-    auto rookWhite1 = new RookModel(piecePosistion, ":/pieces-png/white-rook.png");
-    allPieces.append(rookWhite1);
-    piecePosistion = {8, 1};
-    auto rookWhite2 = new RookModel(piecePosistion, ":/pieces-png/white-rook.png");
-    allPieces.append(rookWhite2);
-
-    piecePosistion = {2, 1};
-    auto knightWhite1 = new KnightModel(piecePosistion, ":/pieces-png/white-knight.png");
-    allPieces.append(knightWhite1);
-    piecePosistion = {7, 1};
-    auto knightWhite2 = new KnightModel(piecePosistion, ":/pieces-png/white-knight.png");
-    allPieces.append(knightWhite2);
-
-    piecePosistion = {3, 1};
-    auto bishopWhite1 = new BishopModel(piecePosistion, ":/pieces-png/white-bishop.png");
-    allPieces.append(bishopWhite1);
-    piecePosistion = {6, 1};
-    auto bishopWhite2 = new BishopModel(piecePosistion, ":/pieces-png/white-bishop.png");
-    allPieces.append(bishopWhite2);
-
-    piecePosistion = {4, 1};
-    auto queenWhite = new QueenModel(piecePosistion, ":/pieces-png/white-queen.png");
-    allPieces.append(queenWhite);
-
-    piecePosistion = {5, 1};
-    auto kingWhite = new KingModel(piecePosistion, ":/pieces-png/white-king.png");
-    allPieces.append(kingWhite);
-
-    for (auto i = quint8{1}; i <= 8; i++) {
-        piecePosistion = {i, 2};
-        auto pawnPiece = new PawnModel(piecePosistion, ":/pieces-png/white-pawn.png");
-        allPieces.append(pawnPiece);
-    }
-
-
-    piecePosistion = {1, 8};
-    auto rookBlack1 = new RookModel(piecePosistion, ":/pieces-png/black-rook.png", false);
-    allPieces.append(rookBlack1);
-    piecePosistion = {8, 8};
-    auto rookBlack2 = new RookModel(piecePosistion, ":/pieces-png/black-rook.png", false);
-    allPieces.append(rookBlack2);
-
-    piecePosistion = {2, 8};
-    auto knightBlack1 = new KnightModel(piecePosistion, ":/pieces-png/black-knight.png", false);
-    allPieces.append(knightBlack1);
-    piecePosistion = {7, 8};
-    auto knightBlack2 = new KnightModel(piecePosistion, ":/pieces-png/black-knight.png", false);
-    allPieces.append(knightBlack2);
-
-    piecePosistion = {3, 8};
-    auto bishopBlack1 = new BishopModel(piecePosistion, ":/pieces-png/black-bishop.png", false);
-    allPieces.append(bishopBlack1);
-    piecePosistion = {6, 8};
-    auto bishopBlack2 = new BishopModel(piecePosistion, ":/pieces-png/black-bishop.png", false);
-    allPieces.append(bishopBlack2);
-
-    piecePosistion = {4, 8};
-    auto queenBlack = new QueenModel(piecePosistion, ":/pieces-png/black-queen.png", false);
-    allPieces.append(queenBlack);
-
-    piecePosistion = {5, 8};
-    auto kingBlack = new KingModel(piecePosistion, ":/pieces-png/black-king.png");
-    allPieces.append(kingBlack);
-
-    for (auto i = quint8{1}; i <= 8; i++) {
-        piecePosistion = {i, 7};
-        auto pawnPiece = new PawnModel(piecePosistion, ":/pieces-png/black-pawn.png", false);
-        allPieces.append(pawnPiece);
-    }
+void ChessBoard::setCurrentPieces(QList<PawnModel *> currentPieces, QList<PawnModel *> deadPieces) {
+    pieces = std::move(currentPieces);
+    deadPiecesToDraw = std::move(deadPieces);
 }
+
+void ChessBoard::updateCircles(QVector<BoardPosition> currentCircles) {
+    moveCircles = std::move(currentCircles);
+}
+
+
+
 
