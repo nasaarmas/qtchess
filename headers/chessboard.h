@@ -4,28 +4,38 @@
 #include <QWidget>
 #include <QAbstractGraphicsShapeItem>
 #include "pawnmodel.h"
-#include "bishopmodel.h"
-#include "rookmodel.h"
-#include "knightmodel.h"
-#include "queenmodel.h"
-#include "kingmodel.h"
+#include "boardposition.h"
 #include <QList>
-class ChessBoard : public QWidget
-{
+#include <QMouseEvent>
+
+class ChessBoard : public QWidget {
 Q_OBJECT
 
+signals:
+
+    void mouseClicked(int x, int y);
+
 public:
-    explicit ChessBoard(QWidget *parent = nullptr);
-    static void printPawn(PawnModel* pawn, QPainter& painter);
-    void updatePieces(QList<PawnModel*> currentPieces);
+    explicit ChessBoard(QWidget *parent = nullptr, int fontSize = 14, int lftBrdPadding = 200, int topBrdPadding = 150,
+               int cellSize = 50);
+
+
+
+    void setCurrentPieces(QList<PawnModel *> currentPieces, QList<PawnModel *> deadPieces);
+    void updateCircles(QVector<BoardPosition> currentCircles);
     ~ChessBoard() override;
 
 
 protected:
     void paintEvent(QPaintEvent *event) override;
 
+    void mousePressEvent(QMouseEvent *event) override;
+
 private:
-    QList<PawnModel*> pieces;
+    static void printPawn(PawnModel *pawn, QPainter &painter);
+    QList<PawnModel *> pieces;
+    QList<PawnModel *> deadPiecesToDraw;
+    QVector<BoardPosition> moveCircles;
     int fontSize, lftBrdPadding, topBrdPadding, cellSize;
 
 };

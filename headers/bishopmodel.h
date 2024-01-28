@@ -5,9 +5,10 @@
 
 class BishopModel : public PawnModel {
 public:
-    BishopModel(BoardPosition pwnBPosition, QString imagePath, bool isWhite = true, bool isAlive = true);
+    BishopModel(BoardPosition pwnBPosition, QString imagePath, bool isWhite = true);
 
-    void movePiece() override;
+    void PossibleMoves(QVector<BoardPosition> *moveVector, const QList<PawnModel *>& pieces) override;
+    void CleanUp() override;
 };
 
 #endif //QTCHESS_PJC_BISHOPMODEL_H
