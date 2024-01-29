@@ -32,17 +32,19 @@ public:
 
     void getPieceClicked(quint8 column, quint8 row);
 
-    void isMoveValid(quint8 column, quint8 row);
+    bool isCellAttacked(quint8 column, quint8 row);
     //void unselectPiece();
 
-
+    bool isMate();
     ~ChessModel();
 
 private:
     void updateMoveVector(PawnModel *pChosenPawn);
 
-    static void initializePieces(QList<PawnModel *> &allPieces);
-
+    static void initializePieces(QList<PawnModel *> &allPieces,PawnModel* &whiteKing, PawnModel* &blackKing);
+    PawnModel* whiteKing;
+    PawnModel* blackKing;
+    bool isWhitePlayerTurn;
     QVector<BoardPosition> pPawnMovesVector;
     QList<PawnModel *> pieces;
     QList<PawnModel *> deadPieces;

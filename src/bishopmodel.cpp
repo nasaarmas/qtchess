@@ -115,3 +115,7 @@ void BishopModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<
 void BishopModel::CleanUp() {
 
 }
+
+bool BishopModel::ValidateMove(int x, int y) {
+    return (std::abs(x - int{pwnBPosition.posX}) == std::abs(y - int{pwnBPosition.posY}));
+}

@@ -20,19 +20,22 @@ void ChessGame::processMouseClick(int x, int y) {
 
         if (!pChessModel->IsPieceSelected()) {
             pChessModel->getPieceClicked(column, row);
-            qDebug() << column << row << "piece: " ;//<< clickedPiece->isAlive << Qt::endl;
+            qDebug() << column << row << "piece: ";//<< clickedPiece->isAlive << Qt::endl;
             pChessBoard->updateCircles(pChessModel->getMovesVector());
             pChessBoard->update();
-        }
-        else {
+        } else {
             pChessModel->ChangePiecePlace(column, row);
             pChessBoard->updateCircles(pChessModel->getMovesVector());
             pChessBoard->setCurrentPieces(pChessModel->getCurrentPieces(), pChessModel->getDeadPieces());
             pChessBoard->update();
         }
     }
-    }
 
-    void ChessGame::showGame() {
-        pChessBoard->show();
+    if (pChessModel->isMate()) {
+        qDebug() << "Biale 123wygrywaja \n";
     }
+}
+
+void ChessGame::showGame() {
+    pChessBoard->show();
+}
