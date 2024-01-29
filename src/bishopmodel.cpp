@@ -6,7 +6,7 @@
 BishopModel::BishopModel(BoardPosition pwnBPosition, QString imagePath, bool isWhite) : PawnModel(
         pwnBPosition, std::move(imagePath), isWhite) {};
 
-void BishopModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<PawnModel *>& pieces) {
+auto BishopModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<PawnModel *> &pieces) -> void {
     auto breakOuterLoop = bool{false};
     for (auto i = quint8{1}; i < 8; i++) {
         if (pwnBPosition.posX + i <= 7 && pwnBPosition.posY + i <= 7) {
@@ -112,10 +112,10 @@ void BishopModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<
 
 }
 
-void BishopModel::CleanUp() {
-
+auto BishopModel::CleanUp() -> bool {
+    return false;
 }
 
-bool BishopModel::ValidateMove(int x, int y) {
+auto BishopModel::ValidateMove(int x, int y) -> bool {
     return (std::abs(x - int{pwnBPosition.posX}) == std::abs(y - int{pwnBPosition.posY}));
 }

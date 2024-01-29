@@ -6,7 +6,7 @@
 QueenModel::QueenModel(BoardPosition pwnBPosition, QString imagePath, bool isWhite) : PawnModel(
         pwnBPosition, std::move(imagePath), isWhite) {};
 
-void QueenModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<PawnModel *> &pieces) {
+auto QueenModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<PawnModel *> &pieces) -> void {
     auto breakOuterLoop = bool{false};
     for (auto i = quint8{1}; i < 8; i++) {
         if (pwnBPosition.posY + i <= 7) {
@@ -212,7 +212,7 @@ void QueenModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<P
     }
 }
 
-bool QueenModel::ValidateMove(int x, int y) {
+auto QueenModel::ValidateMove(int x, int y) -> bool {
     return (std::abs(x - int{pwnBPosition.posX}) == std::abs(y - int{pwnBPosition.posY})) ||
             (x == int{pwnBPosition.posX} || y == int{pwnBPosition.posY});
 }

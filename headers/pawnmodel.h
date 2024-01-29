@@ -11,19 +11,19 @@ class PawnModel {
 public:
     PawnModel(BoardPosition pwnBPosition, QString imagePath, bool isWhite = true);
 
-    virtual void PossibleMoves(QVector<BoardPosition> *moveVector, const QList<PawnModel *> &pieces);
+    virtual auto PossibleMoves(QVector<BoardPosition> *moveVector, const QList<PawnModel *> &pieces) -> void;
 
-    virtual void CleanUp();
+    virtual auto ValidateMove(int x, int y) -> bool;
 
-    virtual bool ValidateMove(int x, int y);
+    virtual auto CleanUp() -> bool;
+
+    virtual ~PawnModel() = default;
 
     BoardPosition pwnBPosition;
     QString imagePath;
     bool isWhite;
+    BoardPosition allowSpecialMove{};
     bool isFirstMove;
-
-    virtual ~PawnModel() = default;
-
 };
 
 #endif //QTCHESS_PJC_PAWNMODEL_H

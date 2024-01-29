@@ -6,7 +6,7 @@
 KnightModel::KnightModel(BoardPosition pwnBPosition, QString imagePath, bool isWhite) : PawnModel(
         pwnBPosition, std::move(imagePath), isWhite) {};
 
-void KnightModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<PawnModel *> &pieces) {
+auto KnightModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<PawnModel *> &pieces) -> void {
     if (pwnBPosition.posX >= 2) {
         if (pwnBPosition.posY + 1 <= 7) {
             moveVector->append(
@@ -61,7 +61,7 @@ void KnightModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<
     }
 }
 
-bool KnightModel::ValidateMove(int x, int y) {
+auto KnightModel::ValidateMove(int x, int y) -> bool {
     return ((std::abs(x - int{pwnBPosition.posX}) == 1 && std::abs(y - int{pwnBPosition.posY}) == 2) ||
-        (std::abs(x - int{pwnBPosition.posX}) == 2 && std::abs(y - int{pwnBPosition.posY})));
+            (std::abs(x - int{pwnBPosition.posX}) == 2 && std::abs(y - int{pwnBPosition.posY})));
 }

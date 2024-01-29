@@ -9,7 +9,8 @@ class ChessGame : public QObject {
 Q_OBJECT;
 public:
     explicit ChessGame(QObject *parent = nullptr);
-    void showGame();
+
+    auto showGame() -> void;
 
 public slots:
     void processMouseClick(int x, int y);

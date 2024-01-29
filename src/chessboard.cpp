@@ -8,20 +8,21 @@
 
 ChessBoard::ChessBoard(QWidget *parent, int fontSize, int lftBrdPadding, int topBrdPadding, int cellSize) : QWidget(
         parent), fontSize(fontSize) {
-    setFixedSize(1300, 700);
+    this->setFixedSize(1300, 700);
     this->fontSize = fontSize;
     this->lftBrdPadding = lftBrdPadding;
     this->topBrdPadding = topBrdPadding;
     this->cellSize = cellSize;
-
+    setMouseTracking(true);
+    isHoveringStartGameButton = false;
+    isHoveringExitButton = false;
     moveCircles = {};
 
 }
 
-void ChessBoard::paintEvent(QPaintEvent *) {
+auto ChessBoard::paintEvent(QPaintEvent *) -> void {
     QPainter painter(this);
     painter.fillRect(rect(), QColor{44, 75, 107});
-
 
     painter.setFont(QFont("Times New Roman", fontSize));
     auto lightColor = QColor{146, 172, 172};
@@ -31,7 +32,6 @@ void ChessBoard::paintEvent(QPaintEvent *) {
         for (auto col{0}; col < 8; col++) {
             auto cellRect = QRect{col * cellSize + lftBrdPadding, row * cellSize + topBrdPadding, cellSize, cellSize};
             painter.fillRect(cellRect, (row + col) % 2 == 0 ? lightColor : darkColor);
-
             painter.setPen(Qt::black);
             painter.drawRect(cellRect);
             painter.setPen(Qt::white);
@@ -55,29 +55,36 @@ void ChessBoard::paintEvent(QPaintEvent *) {
     for (auto *piece: pieces) {
         ChessBoard::printPawn(piece, painter);
     }
+
     auto whichWhiteDead{0}, whichBlackDead{0};
     for (auto *piece: deadPiecesToDraw) {
         auto pawnToBeDrawn = QPixmap{QString(piece->imagePath)};
         auto pawnSize = int{60};
         pawnToBeDrawn = pawnToBeDrawn.scaled(pawnSize, pawnSize);
-        if(piece->isWhite) {
+        if (piece->isWhite) {
             painter.drawPixmap(lftBrdPadding + cellSize * whichWhiteDead, topBrdPadding + 450, pawnToBeDrawn);
             whichWhiteDead++;
         }
-        if(!piece->isWhite) {
+        if (!piece->isWhite) {
             painter.drawPixmap(lftBrdPadding + cellSize * whichBlackDead, 50, pawnToBeDrawn);
             whichBlackDead++;
         }
     }
 
-    auto clickableBlock = QRect(800, 250, 150, 50);
-    painter.fillRect(clickableBlock, QColor(110, 46, 19));
+    startGameButton = QRect(800, 250, 150, 50);
+    QColor blockColor = isHoveringStartGameButton ? QColor(150, 75, 0) : QColor(110, 46, 19);
+    painter.fillRect(startGameButton, blockColor);
     painter.setPen(Qt::white);
-    painter.drawText(clickableBlock, Qt::AlignCenter, "Click me!");
+    painter.drawText(startGameButton, Qt::AlignCenter, "Start Game");
+
+    exitButton = QRect(800, 350, 150, 50);
+    QColor exitButtonColor = isHoveringExitButton ? QColor(150, 75, 0) : QColor(110, 46, 19);
+    painter.fillRect(exitButton, exitButtonColor);
+    painter.setPen(Qt::white);
+    painter.drawText(exitButton, Qt::AlignCenter, "Exit");
 }
 
-void ChessBoard::printPawn(PawnModel *pawn, QPainter &painter) {
-    //auto lftBrdPadding{195}, topBrdPadding{144};
+auto ChessBoard::printPawn(PawnModel *pawn, QPainter &painter) -> void {
     auto pawnToBeDrawn = QPixmap{QString(pawn->imagePath)};
     auto pawnSize = int{60};
     pawnToBeDrawn = pawnToBeDrawn.scaled(pawnSize, pawnSize);
@@ -86,7 +93,7 @@ void ChessBoard::printPawn(PawnModel *pawn, QPainter &painter) {
 }
 
 
-void ChessBoard::mousePressEvent(QMouseEvent *event) {
+auto ChessBoard::mousePressEvent(QMouseEvent *event) -> void {
     emit mouseClicked(event->x(), event->y());
 }
 
@@ -96,14 +103,64 @@ ChessBoard::~ChessBoard() {
     deadPiecesToDraw.clear();
 }
 
-void ChessBoard::setCurrentPieces(QList<PawnModel *> currentPieces, QList<PawnModel *> deadPieces) {
+auto ChessBoard::setCurrentPieces(QList<PawnModel *> currentPieces, QList<PawnModel *> deadPieces) -> void {
     pieces = std::move(currentPieces);
     deadPiecesToDraw = std::move(deadPieces);
 }
 
-void ChessBoard::updateCircles(QVector<BoardPosition> currentCircles) {
+auto ChessBoard::updateCircles(QVector<BoardPosition> currentCircles) -> void {
     moveCircles = std::move(currentCircles);
 }
+
+auto ChessBoard::mouseMoveEvent(QMouseEvent *event) -> void {
+    // Check if the mouse is over the startGameButton
+    if (startGameButton.contains(event->pos())) {
+        if (!isHoveringStartGameButton) {
+            isHoveringStartGameButton = true;
+            update(startGameButton);  // Repaint just the startGameButton area
+        }
+    } else {
+        if (isHoveringStartGameButton) {
+            isHoveringStartGameButton = false;
+            update(startGameButton);  // Repaint just the startGameButton area
+        }
+    }
+    if (exitButton.contains(event->pos())) {
+        if (!isHoveringExitButton) {
+            isHoveringExitButton = true;
+            update(exitButton);  // Repaint just the startGameButton area
+        }
+    } else {
+        if (isHoveringExitButton) {
+            isHoveringExitButton = false;
+            update(exitButton);  // Repaint just the startGameButton area
+        }
+    }
+}
+
+auto ChessBoard::enterEvent(QEvent *event) -> void {
+    // Reset hover state when the cursor enters the widget
+    isHoveringStartGameButton = false;
+    isHoveringExitButton = false;
+    QWidget::enterEvent(event);
+}
+
+auto ChessBoard::leaveEvent(QEvent *event) -> void {
+    // Reset hover state when the cursor leaves the widget
+    if (isHoveringStartGameButton) {
+        isHoveringStartGameButton = false;
+        update(startGameButton);  // Repaint just the startGameButton area
+    } else if (isHoveringExitButton) {
+        isHoveringExitButton = false;
+        update(exitButton);  // Repaint just the startGameButton area
+    }
+    QWidget::leaveEvent(event);
+}
+
+auto ChessBoard::exitGame() -> void {
+    QApplication::quit();
+}
+
 
 
 
