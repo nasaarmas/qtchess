@@ -8,9 +8,9 @@ class KnightModel : public PawnModel {
 public:
     KnightModel(BoardPosition pwnBPosition, QString imagePath, bool isWhite = true);
 
-    bool ValidateMove(int x, int y) override;
+    auto PossibleMoves(QVector<BoardPosition> *moveVector, const QList<PawnModel *> &pieces) -> void override;
 
-    void PossibleMoves(QVector<BoardPosition> *moveVector, const QList<PawnModel *> &pieces) override;
+    auto ValidateMove(int x, int y) -> bool override;
 };
 
 

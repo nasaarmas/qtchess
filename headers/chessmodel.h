@@ -15,41 +15,50 @@ class ChessModel {
 public:
     ChessModel();
 
-    [[nodiscard]] int getLftPadding() const;
+    [[nodiscard]] auto getLftPadding() const -> int;
 
-    [[nodiscard]] int getTopPadding() const;
+    [[nodiscard]] auto getTopPadding() const -> int;
 
-    [[nodiscard]] int getCellSize() const;
+    [[nodiscard]] auto getCellSize() const -> int;
 
-    [[nodiscard]] QList<PawnModel *> getCurrentPieces() const;
-    [[nodiscard]] QList<PawnModel *> getDeadPieces() const;
+    [[nodiscard]] auto GameOn() const -> bool;
 
-    [[nodiscard]] QVector<BoardPosition> getMovesVector() const;
+    [[nodiscard]] auto getCurrentPieces() const -> QList<PawnModel *>;
 
-    void ChangePiecePlace(quint8 x, quint8 y);
+    [[nodiscard]] auto getDeadPieces() const -> QList<PawnModel *>;
 
-    bool IsPieceSelected();
+    [[nodiscard]] auto getMovesVector() const -> QVector<BoardPosition>;
 
-    void getPieceClicked(quint8 column, quint8 row);
+    auto ChangePiecePlace(quint8 x, quint8 y) -> void;
 
-    bool isCellAttacked(quint8 column, quint8 row);
-    //void unselectPiece();
+    auto startGame() -> void;
 
-    bool isMate();
+    auto isPieceSelected() -> bool;
+
+    auto getPieceClicked(quint8 column, quint8 row) -> void;
+
+    auto isCellAttacked(quint8 column, quint8 row) -> bool;
+
+    auto isMate() -> bool;
+
     ~ChessModel();
 
 private:
-    void updateMoveVector(PawnModel *pChosenPawn);
+    static auto initializePieces(QList<PawnModel *> &allPieces, PawnModel *&whiteKing, PawnModel *&blackKing) -> void;
 
-    static void initializePieces(QList<PawnModel *> &allPieces,PawnModel* &whiteKing, PawnModel* &blackKing);
-    PawnModel* whiteKing;
-    PawnModel* blackKing;
+    auto updateMoveVector(PawnModel *pChosenPawn) -> void;
+
+    auto clearEnPassants() -> void;
+
+    PawnModel *whiteKing;
+    PawnModel *blackKing;
     bool isWhitePlayerTurn;
     QVector<BoardPosition> pPawnMovesVector;
     QList<PawnModel *> pieces;
     QList<PawnModel *> deadPieces;
     PawnModel *currentlySelectedPawn;
     int fontSize, lftBrdPadding, topBrdPadding, cellSize;
+    bool isGameOn;
 };
 
 #endif //QTCHESS_PJC_CHESSMODEL_H

@@ -5,9 +5,10 @@
 PawnModel::PawnModel(BoardPosition pwnBPosition, QString imagePath, bool isWhite) :
         pwnBPosition(pwnBPosition), imagePath(std::move(imagePath)), isWhite(isWhite) {
     this->isFirstMove = true;
+    this->allowSpecialMove = {};
 }
 
-void PawnModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<PawnModel *> &pieces) {
+auto PawnModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<PawnModel *> &pieces) -> void {
     if (isWhite) {
         if (pwnBPosition.posY < 7) {
             moveVector->append({pwnBPosition.posX, static_cast<quint8>(pwnBPosition.posY + 1)});
@@ -62,13 +63,11 @@ void PawnModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<Pa
             if (pawn->pwnBPosition.posX == pwnBPosition.posX && pawn->pwnBPosition.posY == pwnBPosition.posY - 1) {
                 moveVector->remove(0);
             }
-
         }
     }
-}
-
-void PawnModel::CleanUp() {
-    isFirstMove = false;
+    if (allowSpecialMove.posX && allowSpecialMove.posY) {
+        moveVector->append(allowSpecialMove);
+    }
 }
 
 bool PawnModel::ValidateMove(int x, int y) {
@@ -85,3 +84,13 @@ bool PawnModel::ValidateMove(int x, int y) {
     }
     return false;
 }
+
+auto PawnModel::CleanUp() -> bool {
+    if (isFirstMove) {
+        isFirstMove = false;
+        return true;
+    }
+    return false;
+}
+
+

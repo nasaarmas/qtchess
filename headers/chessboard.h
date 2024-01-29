@@ -17,22 +17,37 @@ signals:
 
 public:
     explicit ChessBoard(QWidget *parent = nullptr, int fontSize = 14, int lftBrdPadding = 200, int topBrdPadding = 150,
-               int cellSize = 50);
+                        int cellSize = 50);
 
+    auto setCurrentPieces(QList<PawnModel *> currentPieces, QList<PawnModel *> deadPieces) -> void;
 
+    auto updateCircles(QVector<BoardPosition> currentCircles) -> void;
 
-    void setCurrentPieces(QList<PawnModel *> currentPieces, QList<PawnModel *> deadPieces);
-    void updateCircles(QVector<BoardPosition> currentCircles);
     ~ChessBoard() override;
 
+    QRect startGameButton;
+
+    QRect exitButton;
+
+    static auto exitGame() -> void;
+
+    bool isHoveringStartGameButton;
+    bool isHoveringExitButton;
 
 protected:
-    void paintEvent(QPaintEvent *event) override;
+    auto paintEvent(QPaintEvent *event) -> void override;
 
-    void mousePressEvent(QMouseEvent *event) override;
+    auto mouseMoveEvent(QMouseEvent *event) -> void override;
+
+    auto enterEvent(QEvent *event) -> void override;
+
+    auto leaveEvent(QEvent *event) -> void override;
+
+    auto mousePressEvent(QMouseEvent *event) -> void override;
 
 private:
-    static void printPawn(PawnModel *pawn, QPainter &painter);
+    static auto printPawn(PawnModel *pawn, QPainter &painter) -> void;
+
     QList<PawnModel *> pieces;
     QList<PawnModel *> deadPiecesToDraw;
     QVector<BoardPosition> moveCircles;

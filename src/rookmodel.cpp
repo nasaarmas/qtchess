@@ -6,7 +6,7 @@
 RookModel::RookModel(BoardPosition pwnBPosition, QString imagePath, bool isWhite) : PawnModel(
         pwnBPosition, std::move(imagePath), isWhite) {};
 
-void RookModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<PawnModel *>& pieces) {
+auto RookModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<PawnModel *>& pieces) -> void {
     auto breakOuterLoop = bool{false};
     for (auto i = quint8{1}; i < 8; i++) {
         if (pwnBPosition.posY + i <= 7) {
@@ -112,6 +112,6 @@ void RookModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<Pa
     }
 }
 
-bool RookModel::ValidateMove(int x, int y) {
+auto RookModel::ValidateMove(int x, int y) -> bool {
     return x == int{pwnBPosition.posX} || y == int{pwnBPosition.posY};
 }
