@@ -15,6 +15,8 @@ public:
 
     virtual void CleanUp();
 
+    virtual bool ValidateMove(int x, int y);
+
     BoardPosition pwnBPosition;
     QString imagePath;
     bool isWhite;

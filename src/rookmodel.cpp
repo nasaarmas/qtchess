@@ -111,3 +111,7 @@ void RookModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<Pa
                             pwnBPosition.posY});
     }
 }
+
+bool RookModel::ValidateMove(int x, int y) {
+    return x == int{pwnBPosition.posX} || y == int{pwnBPosition.posY};
+}

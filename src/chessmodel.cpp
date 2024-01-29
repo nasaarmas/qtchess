@@ -2,7 +2,9 @@
 
 
 ChessModel::ChessModel() {
-    initializePieces(this->pieces);
+    blackKing = {};
+    whiteKing = {};
+    initializePieces(this->pieces, whiteKing, blackKing);
     fontSize = 14;
     lftBrdPadding = 200;
     topBrdPadding = 150;
@@ -10,9 +12,10 @@ ChessModel::ChessModel() {
     pPawnMovesVector = {};
     currentlySelectedPawn = nullptr;
     deadPieces = {};
+    isWhitePlayerTurn = true;
 }
 
-void ChessModel::initializePieces(QList<PawnModel *> &allPieces) {
+void ChessModel::initializePieces(QList<PawnModel *> &allPieces, PawnModel *&whiteKing, PawnModel *&blackKing) {
     auto piecePosition = BoardPosition{0, 0};
     auto rookWhite1 = new RookModel(piecePosition, ":/pieces-png/white-rook.png");
     allPieces.append(rookWhite1);
@@ -83,6 +86,9 @@ void ChessModel::initializePieces(QList<PawnModel *> &allPieces) {
         auto pawnPiece = new PawnModel(piecePosition, ":/pieces-png/black-pawn.png", false);
         allPieces.append(pawnPiece);
     }
+    whiteKing = kingWhite;
+    blackKing = kingBlack;
+
 }
 
 ChessModel::~ChessModel() {
@@ -113,9 +119,13 @@ int ChessModel::getCellSize() const {
     return cellSize;
 }
 
+QVector<BoardPosition> ChessModel::getMovesVector() const {
+    return pPawnMovesVector;
+}
+
 void ChessModel::getPieceClicked(quint8 column, quint8 row) {
     for (auto *piece: pieces) {
-        if (piece->pwnBPosition.posX == column && piece->pwnBPosition.posY == row) {
+        if (piece->pwnBPosition.posX == column && piece->pwnBPosition.posY == row && piece->isWhite == isWhitePlayerTurn) {
             currentlySelectedPawn = piece;
             updateMoveVector(piece);
             return;
@@ -123,45 +133,78 @@ void ChessModel::getPieceClicked(quint8 column, quint8 row) {
     }
 }
 
-QVector<BoardPosition> ChessModel::getMovesVector() const {
-    return pPawnMovesVector;
-}
-
 void ChessModel::updateMoveVector(PawnModel *pChosenPawn) {
     if (!pPawnMovesVector.empty()) {
         pPawnMovesVector.clear();
     }
     pChosenPawn->PossibleMoves(&pPawnMovesVector, pieces);
+    auto correctPosition = currentlySelectedPawn->pwnBPosition;
 
-}
+    pPawnMovesVector.erase(std::remove_if(pPawnMovesVector.begin(), pPawnMovesVector.end(), [&](const auto& move) {
+        // Simulate the move
+        currentlySelectedPawn->pwnBPosition = move;
 
-void ChessModel::ChangePiecePlace(quint8 x, quint8 y) {
-    bool canDo = false;
-    for (const auto &move: pPawnMovesVector) {
-        if (move.posX == x && move.posY == y) {
-            canDo = true;
-            break;
-        }
-    }
-    if (canDo) {
+        // Find if there is a piece at the move position and temporarily remove it
+        PawnModel* capturedPiece = nullptr;
         for (auto it = pieces.begin(); it != pieces.end(); ++it) {
-            auto *piece = *it;
-
-            if (piece->pwnBPosition.posX == x && piece->pwnBPosition.posY == y) {
-                qDebug() << "am i even here \n";
-                deadPieces.append(piece);
+            if ((*it)->pwnBPosition.posX == move.posX && (*it)->pwnBPosition.posY == move.posY && *it != currentlySelectedPawn) {
+                capturedPiece = *it;
                 pieces.erase(it);
                 break;
             }
         }
+
+        // Check if the king is in check after the move
+        bool isKingInCheck = isWhitePlayerTurn ?
+                             isCellAttacked(whiteKing->pwnBPosition.posX, whiteKing->pwnBPosition.posY) :
+                             isCellAttacked(blackKing->pwnBPosition.posX, blackKing->pwnBPosition.posY);
+
+        // Undo the move
+        currentlySelectedPawn->pwnBPosition = correctPosition;
+
+        // Restore the captured piece if there was one
+        if (capturedPiece) {
+            pieces.push_back(capturedPiece);
+        }
+
+        return isKingInCheck;
+    }), pPawnMovesVector.end());
+}
+
+void ChessModel::ChangePiecePlace(quint8 x, quint8 y) {
+    bool canMove = false;
+    for (const auto &move: pPawnMovesVector) {
+        if (move.posX == x && move.posY == y) {
+            canMove = true;
+            break;
+        }
+    }
+    if (canMove) {
+        // Check if there is a piece in the destination cell to capture it
+        auto it = std::find_if(pieces.begin(), pieces.end(), [x, y](const PawnModel* piece) {
+            return piece->pwnBPosition.posX == x && piece->pwnBPosition.posY == y;
+        });
+
+        if (it != pieces.end()) {
+            // If there is a piece at the destination, capture it (add to deadPieces)
+            deadPieces.append(*it);
+            pieces.erase(it);
+        }
+
+        // Move the currently selected pawn to the new position
         currentlySelectedPawn->pwnBPosition.posX = x;
         currentlySelectedPawn->pwnBPosition.posY = y;
         currentlySelectedPawn->CleanUp();
+
+        // Switch the turn
+        isWhitePlayerTurn = !isWhitePlayerTurn;
     }
+
+    // Reset the selected pawn and available moves
     currentlySelectedPawn = nullptr;
     pPawnMovesVector.clear();
-
 }
+
 
 bool ChessModel::IsPieceSelected() {
     if (currentlySelectedPawn) {
@@ -171,8 +214,272 @@ bool ChessModel::IsPieceSelected() {
     }
 }
 
-void ChessModel::isMoveValid(quint8 column, quint8 row) {
+bool ChessModel::isCellAttacked(quint8 column, quint8 row) {
+    auto breakOuterLoop = bool{false};
+    for (auto i = quint8{1}; i < 8; i++) {
+        if (row + i <= 7) {
+            for (const auto &pawn: pieces) {
+                if (column == pawn->pwnBPosition.posX &&
+                    row + i == pawn->pwnBPosition.posY) {
+                    if (isWhitePlayerTurn != pawn->isWhite && pawn->ValidateMove(int(column), int(row))) {
 
+                        return true;
+
+                    }
+                    breakOuterLoop = true;
+                    break;
+                }
+            }
+        } else {
+            break;
+        }
+        if (breakOuterLoop) {
+            break;
+        }
+    }
+
+    breakOuterLoop = bool{false};
+    for (auto i = quint8{1}; i < 8; i++) {
+        if (column + i <= 7) {
+            for (const auto &pawn: pieces) {
+                if (column + i == pawn->pwnBPosition.posX &&
+                    row == pawn->pwnBPosition.posY) {
+                    if (isWhitePlayerTurn != pawn->isWhite && pawn->ValidateMove(int(column), int(row))) {
+
+                        return true;
+
+                    }
+                    breakOuterLoop = true;
+                    break;
+                }
+            }
+        } else {
+            break;
+        }
+        if (breakOuterLoop) {
+            break;
+        }
+    }
+
+
+    breakOuterLoop = bool{false};
+    for (auto i = quint8{1}; i < 8; i++) {
+        if (row >= i) {
+            for (const auto &pawn: pieces) {
+                if (column == pawn->pwnBPosition.posX &&
+                    row - i == pawn->pwnBPosition.posY) {
+                    if (isWhitePlayerTurn != pawn->isWhite && pawn->ValidateMove(int(column), int(row))) {
+
+                        return true;
+
+                    }
+                    breakOuterLoop = true;
+                    break;
+                }
+            }
+        } else {
+            break;
+        }
+        if (breakOuterLoop) {
+            break;
+        }
+    }
+
+    breakOuterLoop = bool{false};
+    for (auto i = quint8{1}; i < 8; i++) {
+        if (row >= i) {
+            for (const auto &pawn: pieces) {
+                if (column - i == pawn->pwnBPosition.posX &&
+                    row == pawn->pwnBPosition.posY) {
+                    if (isWhitePlayerTurn != pawn->isWhite && pawn->ValidateMove(int(column), int(row))) {
+
+                        return true;
+
+                    }
+                    breakOuterLoop = true;
+                    break;
+                }
+            }
+        } else {
+            break;
+        }
+        if (breakOuterLoop) {
+            break;
+        }
+    }
+
+
+    breakOuterLoop = bool{false};
+    for (auto i = quint8{1}; i < 8; i++) {
+        if (column + i <= 7 && row + i <= 7) {
+            for (const auto &pawn: pieces) {
+                if (column + i == pawn->pwnBPosition.posX &&
+                    row + i == pawn->pwnBPosition.posY) {
+                    if (isWhitePlayerTurn != pawn->isWhite && pawn->ValidateMove(int(column), int(row))) {
+
+                        return true;
+
+                    }
+                    breakOuterLoop = true;
+                    break;
+                }
+            }
+        } else {
+            break;
+        }
+        if (breakOuterLoop) {
+            break;
+        }
+    }
+
+    breakOuterLoop = false;
+    for (auto i = quint8{1}; i < 8; i++) {
+        if (column + i <= 7 && row >= i) {
+            for (const auto &pawn: pieces) {
+                if (column + i == pawn->pwnBPosition.posX &&
+                    row - i == pawn->pwnBPosition.posY) {
+                    if (isWhitePlayerTurn != pawn->isWhite && pawn->ValidateMove(int(column), int(row))) {
+
+                        return true;
+
+                    }
+                    breakOuterLoop = true;
+                    break;
+                }
+            }
+        } else {
+            break;
+        }
+        if (breakOuterLoop) {
+            break;
+        }
+    }
+
+    breakOuterLoop = false;
+    for (auto i = quint8{1}; i < 8; i++) {
+        if (column >= i && row >= i) {
+            for (const auto &pawn: pieces) {
+                if (column - i == pawn->pwnBPosition.posX &&
+                    row - i == pawn->pwnBPosition.posY) {
+                    if (isWhitePlayerTurn != pawn->isWhite && pawn->ValidateMove(int(column), int(row))) {
+
+                        return true;
+
+                    }
+                    breakOuterLoop = true;
+                    break;
+                }
+            }
+        } else {
+            break;
+        }
+        if (breakOuterLoop) {
+            break;
+        }
+    }
+
+    breakOuterLoop = false;
+    for (auto i = quint8{1}; i < 8; i++) {
+        if (column >= i && row + i <= 7) {
+            for (const auto &pawn: pieces) {
+                if (column - i == pawn->pwnBPosition.posX &&
+                    row + i == pawn->pwnBPosition.posY) {
+                    if (isWhitePlayerTurn != pawn->isWhite && pawn->ValidateMove(int(column), int(row))) {
+
+                        return true;
+
+                    }
+                    breakOuterLoop = true;
+                    break;
+                }
+            }
+        } else {
+            break;
+        }
+        if (breakOuterLoop) {
+            break;
+        }
+    }
+
+    breakOuterLoop = false;
+    int knightMovesX[] = {2, 1, -1, -2, -2, -1, 1, 2};
+    int knightMovesY[] = {1, 2, 2, 1, -1, -2, -2, -1};
+    for (const auto &pawn: pieces) {
+        for (auto i = int{0}; i < 8; i++) {
+            if (column + knightMovesX[i] == pawn->pwnBPosition.posX &&
+                row + knightMovesY[i] == pawn->pwnBPosition.posY) {
+                if (isWhitePlayerTurn != pawn->isWhite && pawn->ValidateMove(int(column), int(row))) {
+
+                    return true;
+
+                }
+                breakOuterLoop = true;
+                break;
+            }
+        }
+        if (breakOuterLoop) {
+            break;
+        }
+    }
+    return false;
 }
+
+bool ChessModel::isMate() {
+    PawnModel *currentKing = isWhitePlayerTurn ? whiteKing : blackKing;
+    QVector<BoardPosition> tempMoves = {};
+    currentKing->PossibleMoves(&tempMoves, pieces);
+
+    // Check if the king can move out of the check
+    auto correctPosition = currentKing->pwnBPosition;
+    tempMoves.erase(std::remove_if(tempMoves.begin(), tempMoves.end(), [&](const auto& move) {
+        currentKing->pwnBPosition = move;
+        bool attacked = isCellAttacked(currentKing->pwnBPosition.posX, currentKing->pwnBPosition.posY);
+        currentKing->pwnBPosition = correctPosition;
+        return attacked;
+    }), tempMoves.end());
+
+    if (!tempMoves.isEmpty() || !isCellAttacked(currentKing->pwnBPosition.posX, currentKing->pwnBPosition.posY)) {
+        return false; // King can move to a safe position or is not in check
+    }
+
+    // Check if any piece can block the check or capture the threatening piece
+    for (auto *piece : pieces) {
+        if (piece->isWhite == isWhitePlayerTurn) {
+            QVector<BoardPosition> pieceMoves = {};
+            piece->PossibleMoves(&pieceMoves, pieces);
+            for (const auto &move : pieceMoves) {
+                auto originalPosition = piece->pwnBPosition;
+                piece->pwnBPosition = move;
+
+                // Simulate capturing an opponent's piece
+                PawnModel* capturedPiece = nullptr;
+                auto it = std::find_if(pieces.begin(), pieces.end(), [move](const PawnModel* otherPiece) {
+                    return otherPiece->pwnBPosition.posX == move.posX && otherPiece->pwnBPosition.posY == move.posY;
+                });
+                if (it != pieces.end() && (*it)->isWhite != isWhitePlayerTurn) {
+                    capturedPiece = *it;
+                    pieces.erase(it);
+                }
+
+                bool kingIsAttacked = isCellAttacked(currentKing->pwnBPosition.posX, currentKing->pwnBPosition.posY);
+
+                // Undo the move and restore captured piece if any
+                piece->pwnBPosition = originalPosition;
+                if (capturedPiece) {
+                    pieces.push_back(capturedPiece);
+                }
+
+                if (!kingIsAttacked) {
+                    return false; // A piece can block the check or capture the threatening piece
+                }
+            }
+        }
+    }
+
+
+    qDebug() << "Game over: " << (isWhitePlayerTurn ? "White wins" : "Black wins");
+    return true; // Checkmate
+}
+
 
 

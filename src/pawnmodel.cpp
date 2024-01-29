@@ -70,3 +70,18 @@ void PawnModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<Pa
 void PawnModel::CleanUp() {
     isFirstMove = false;
 }
+
+bool PawnModel::ValidateMove(int x, int y) {
+    auto pwnX = int{pwnBPosition.posX};
+    auto pwnY = int{pwnBPosition.posY};
+    if (isWhite) {
+        if (std::abs(x - pwnX) == 1 && y - pwnY == 1) {
+            return true;
+        }
+    } else {
+        if (std::abs(x - pwnX) == 1 && y - pwnY == -1) {
+            return true;
+        }
+    }
+    return false;
+}

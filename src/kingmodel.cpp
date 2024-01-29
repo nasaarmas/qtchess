@@ -43,3 +43,7 @@ void KingModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<Pa
         }
     }
 }
+
+bool KingModel::ValidateMove(int x, int y) {
+    return std::abs(x - int{pwnBPosition.posX}) <= 1 && std::abs(y - int{pwnBPosition.posY}) <= 1;
+}

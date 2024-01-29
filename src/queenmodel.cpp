@@ -6,11 +6,15 @@
 QueenModel::QueenModel(BoardPosition pwnBPosition, QString imagePath, bool isWhite) : PawnModel(
         pwnBPosition, std::move(imagePath), isWhite) {};
 
-void QueenModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<PawnModel *>& pieces) {
+void QueenModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<PawnModel *> &pieces) {
     auto breakOuterLoop = bool{false};
     for (auto i = quint8{1}; i < 8; i++) {
         if (pwnBPosition.posY + i <= 7) {
             for (const auto &pawn: pieces) {
+                if (pwnBPosition.posX == pawn->pwnBPosition.posX &&
+                    pwnBPosition.posY == pawn->pwnBPosition.posY && isWhite != pawn->isWhite){
+                    return;
+                }
                 if (pwnBPosition.posX == pawn->pwnBPosition.posX &&
                     pwnBPosition.posY + i == pawn->pwnBPosition.posY) {
                     if (isWhite != pawn->isWhite) {
@@ -22,8 +26,7 @@ void QueenModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<P
 
                 }
             }
-        }
-        else{
+        } else {
             break;
         }
         if (breakOuterLoop) {
@@ -48,8 +51,7 @@ void QueenModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<P
 
                 }
             }
-        }
-        else{
+        } else {
             break;
         }
         if (breakOuterLoop) {
@@ -74,8 +76,7 @@ void QueenModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<P
 
                 }
             }
-        }
-        else{
+        } else {
             break;
         }
         if (breakOuterLoop) {
@@ -100,8 +101,7 @@ void QueenModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<P
 
                 }
             }
-        }
-        else{
+        } else {
             break;
         }
         if (breakOuterLoop) {
@@ -199,10 +199,8 @@ void QueenModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<P
                     }
                     breakOuterLoop = true;
                     break;
-
                 }
             }
-
         } else {
             break;
         }
@@ -212,5 +210,9 @@ void QueenModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<P
         moveVector->append({static_cast<quint8>(pwnBPosition.posX - i),
                             static_cast<quint8>(pwnBPosition.posY + i)});
     }
+}
 
+bool QueenModel::ValidateMove(int x, int y) {
+    return (std::abs(x - int{pwnBPosition.posX}) == std::abs(y - int{pwnBPosition.posY})) ||
+            (x == int{pwnBPosition.posX} || y == int{pwnBPosition.posY});
 }

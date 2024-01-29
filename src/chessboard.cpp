@@ -13,7 +13,9 @@ ChessBoard::ChessBoard(QWidget *parent, int fontSize, int lftBrdPadding, int top
     this->lftBrdPadding = lftBrdPadding;
     this->topBrdPadding = topBrdPadding;
     this->cellSize = cellSize;
+
     moveCircles = {};
+
 }
 
 void ChessBoard::paintEvent(QPaintEvent *) {
