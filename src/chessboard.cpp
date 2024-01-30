@@ -102,13 +102,11 @@ auto ChessBoard::paintEvent(QPaintEvent *) -> void {
     painter.setPen(Qt::white);  // Set the text color to white
 
 // Define QRects for the bigger text above the buttons
-    QRect startGameTextRect(startGameButton.x() - 50, startGameButton.y() - 100, startGameButton.width()* 2 , 100);
+    QRect startGameTextRect(startGameButton.x() - 50, startGameButton.y() - 100, startGameButton.width() * 2 + 50, 100);
 
 // Draw the text
     painter.drawText(startGameTextRect, Qt::AlignCenter, infoText);
     painter.setFont(QFont("Times New Roman", fontSize));
-
-
 }
 
 auto ChessBoard::mouseMoveEvent(QMouseEvent *event) -> void {
@@ -174,7 +172,7 @@ ChessBoard::~ChessBoard() {
 }
 
 auto ChessBoard::setInfoString(QString newInfo) -> void {
-    infoText = newInfo;
+    infoText = std::move(newInfo);
 }
 
 

@@ -2,13 +2,13 @@
 #define QTCHESS_PJC_CHESSMODEL_H
 
 #include <QList>
-#include <QDebug>
 #include "pawnmodel.h"
 #include "bishopmodel.h"
 #include "rookmodel.h"
 #include "knightmodel.h"
 #include "queenmodel.h"
 #include "kingmodel.h"
+#include <string>
 
 
 class ChessModel {
@@ -29,6 +29,8 @@ public:
 
     [[nodiscard]] auto isWhiteTurn() const -> bool;
 
+    [[nodiscard]] auto generateFEN() const -> QString;
+
     auto getMovesVector() -> QVector<BoardPosition>;
 
     auto ChangePiecePlace(quint8 x, quint8 y) -> void;
@@ -37,7 +39,7 @@ public:
 
     auto stopGame() -> void;
 
-    void popCurrentPieceFromMoves();
+    auto popCurrentPieceFromMoves() -> void;
 
     auto isPieceSelected() -> bool;
 
@@ -49,17 +51,30 @@ public:
 
     auto isMate() -> bool;
 
-
     ~ChessModel();
 
 private:
     static auto initializePieces(QList<PawnModel *> &allPieces, PawnModel *&whiteKing, PawnModel *&blackKing) -> void;
 
     auto updateMoveVector(PawnModel *pChosenPawn) -> void;
-    auto performCastling(quint8 x, quint8 y) -> void;
+
+    auto performCastling(quint8 x) -> void;
+
     auto PromotePawn() -> void;
+
     auto KillAtack(quint8 x, quint8 y) -> void;
+
     auto clearEnPassants() -> void;
+
+    auto restorePiece(PawnModel *capturedPiece, int capturedPieceIndex) -> void;
+
+    auto removePieceAt(const BoardPosition &position, PawnModel *&capturedPiece, int &capturedPieceIndex) -> void;
+
+    auto simulatesCheck(PawnModel *pChosenPawn, const BoardPosition &move) -> bool;
+
+    static auto pieceCharFromType(const PawnModel *piece) -> char;
+
+    [[nodiscard]] auto findPieceAt(int x, int y) const -> PawnModel *;
 
     PawnModel *whiteKing;
     PawnModel *blackKing;
@@ -68,10 +83,8 @@ private:
     QList<PawnModel *> pieces;
     QList<PawnModel *> deadPieces;
     PawnModel *currentlySelectedPawn;
-    int fontSize, lftBrdPadding, topBrdPadding, cellSize;
+    int fontSize, lftBrdPadding, topBrdPadding, cellSize, turnNumber, fromLastKill;
     bool isGameOn;
-
-
 };
 
 #endif //QTCHESS_PJC_CHESSMODEL_H

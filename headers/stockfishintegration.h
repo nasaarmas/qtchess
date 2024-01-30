@@ -14,19 +14,17 @@ class StockFishIntegration {
 public:
     explicit StockFishIntegration(const QString &enginePath);
 
+    auto getOutput(int waitTime) -> QString;
+
+    auto testBestMove(const QString &fen, unsigned int waitTime) -> QString;
+
     ~StockFishIntegration();
 
-    void sendCommand(const std::string &command);
-
-    std::string getOutput(unsigned int waitTime);
-
-    std::string testBestMove(const std::string &fen, unsigned int waitTime);
-
 private:
+    auto sendCommand(const QString &command) -> void;
+
     QProcess stockfishProcess;
     QString enginePath;
-
-
 };
 
 #endif //QTCHESS_PJC_STOCKFISHINTEGRATION_H

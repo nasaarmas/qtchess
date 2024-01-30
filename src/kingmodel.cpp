@@ -4,7 +4,7 @@
 
 
 KingModel::KingModel(BoardPosition pwnBPosition, QString imagePath, bool isWhite) : PawnModel(
-        pwnBPosition, std::move(imagePath), isWhite) {};
+        pwnBPosition, std::move(imagePath), isWhite) {}
 
 auto KingModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<PawnModel *> &pieces) -> void {
     if (pwnBPosition.posX >= 1) {
@@ -77,21 +77,17 @@ auto KingModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<Pa
         }
     }
 
-
     // Iterate through the moveVector to check if a castling move is present
     if (isFirstMove) { // Ensure the king has not moved
         for (const auto &move: *moveVector) {
             if (((move.posX == pwnBPosition.posX + 2) || // King moves two squares to the right
                  (move.posX == pwnBPosition.posX - 2)) && // King moves two squares to the left
                 move.posY == pwnBPosition.posY) { // Y position remains the same
-
                 this->allowSpecialMove = {20, 20};
                 break;
             }
         }
     }
-
-
 }
 
 auto KingModel::ValidateMove(int x, int y) -> bool {
