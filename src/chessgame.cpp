@@ -22,26 +22,36 @@ auto ChessGame::processMouseClick(int x, int y) -> void {
             pChessModel->getPieceClicked(column, row);
             pChessBoard->updateCircles(pChessModel->getMovesVector());
             pChessBoard->update();
+            pChessModel->popCurrentPieceFromMoves();
         } else {
             pChessModel->ChangePiecePlace(column, row);
             pChessBoard->updateCircles(pChessModel->getMovesVector());
             pChessBoard->setCurrentPieces(pChessModel->getCurrentPieces(), pChessModel->getDeadPieces());
             pChessBoard->update();
+            //pChessModel->popCurrentPieceFromMoves();
         }
+        pChessBoard->setInfoString((pChessModel->isWhiteTurn() ? "White player turn" : "Black player turn"));
+        if (pChessModel->isMate()) {
+            pChessBoard->setInfoString((pChessModel->isWhiteTurn() ? "Black WINS!" : "White WINS!"));
+            pChessModel->stopGame();
+            pChessBoard->update();
+
+        }
+
+
     }
     if (pChessBoard->startGameButton.contains(x, y)) {
         pChessModel.reset();
         pChessModel = std::make_unique<ChessModel>();
         pChessBoard->setCurrentPieces(pChessModel->getCurrentPieces(), pChessModel->getDeadPieces());
         pChessModel->startGame();
+        pChessBoard->setInfoString("White player turn");
         pChessBoard->update();
     }
     if (pChessBoard->exitButton.contains(x, y)) {
         pChessBoard->exitGame();
     }
-    if (pChessModel->isMate()) {
-        qDebug() << "Biale 123wygrywaja \n";
-    }
+
 }
 
 auto ChessGame::showGame() -> void {
