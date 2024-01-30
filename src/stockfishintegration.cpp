@@ -1,13 +1,15 @@
 #include "../headers/stockfishintegration.h"
 
 StockFishIntegration::StockFishIntegration(const QString &enginePath) {
-    stockfishProcess.start(enginePath, QProcess::ReadWrite);
+    QStringList arguments;  // Create an empty QStringList for the arguments if there are any
+    stockfishProcess.start(enginePath, arguments, QProcess::ReadWrite);  // Updated start function
     if (!stockfishProcess.waitForStarted()) {
         qDebug() << "Stockfish failed to start." << Qt::endl;
     } else {
         sendCommand("uci");  // Initialize the UCI (Universal Chess Interface)
     }
 }
+
 
 auto StockFishIntegration::getOutput(int waitTime) -> QString {
     QString output;
