@@ -17,20 +17,17 @@ auto StockFishIntegration::getOutput(int waitTime) -> QString {
     return output;
 }
 
-auto StockFishIntegration::testBestMove(const QString &fen, unsigned int waitTime) -> QString {
+auto StockFishIntegration::testBestMove(const QString &fen, int waitTime) -> QString {
     // Reset the engine to a new game and set the position
     sendCommand("ucinewgame");
     sendCommand("position fen " + fen);
-
     // Ask the engine to calculate the best move
     sendCommand("go depth 15");
 
-    // Read the output from the engine
     QString output;
     QString bestMoveLine;
     do {
         output = getOutput(waitTime);
-        //qDebug() << "Output: " << output; // Add this line for debugging
         if (output.contains("bestmove")) {
             bestMoveLine = output;
             break;

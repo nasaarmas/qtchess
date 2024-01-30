@@ -499,76 +499,36 @@ auto ChessModel::updateMoveVector(PawnModel *pChosenPawn) -> void {
     }
 
     pChosenPawn->PossibleMoves(&pPawnMovesVector, pieces);
+    auto correctPosition = pChosenPawn->pwnBPosition;
+    pPawnMovesVector.erase(std::remove_if(pPawnMovesVector.begin(), pPawnMovesVector.end(), [&](const auto &move) {
+        // Simulate the move
+        pChosenPawn->pwnBPosition = move;
+        // Find if there is a piece at the move position and temporarily remove it
+        PawnModel *capturedPiece = nullptr;
+        int capturedPieceIndex = -1;
+        for (auto i = int{0}; i < pieces.size(); i++) {
 
-    // Remove moves that put or leave the king in check
-    pPawnMovesVector.erase(std::remove_if(pPawnMovesVector.begin(), pPawnMovesVector.end(),
-                                          [this, pChosenPawn](const auto &move) {
-                                              return simulatesCheck(pChosenPawn, move);
-                                          }),
-                           pPawnMovesVector.end());
-
-    // Additional check for castling moves
-    if (typeid(*pChosenPawn) == typeid(KingModel) && pChosenPawn->isFirstMove) {
-        pPawnMovesVector.erase(std::remove_if(pPawnMovesVector.begin(), pPawnMovesVector.end(),
-                                              [this, pChosenPawn](const auto &move) {
-                                                  if (std::abs(move.posX - pChosenPawn->pwnBPosition.posX) ==
-                                                      2) { // Castling move
-                                                      quint8 direction = (move.posX - pChosenPawn->pwnBPosition.posX >
-                                                                          0) ? 1 : -1;
-                                                      quint8 start = pChosenPawn->pwnBPosition.posX;
-                                                      quint8 end = move.posX;
-                                                      for (quint8 x = start; x != end; x += direction) {
-                                                          if (isCellAttacked(x, pChosenPawn->pwnBPosition.posY)) {
-                                                              return true; // The cell is attacked, so the castling move is not valid
-                                                          }
-                                                      }
-                                                      // Check the final position as well
-                                                      return isCellAttacked(end, pChosenPawn->pwnBPosition.posY);
-                                                  }
-                                                  return false; // Not a castling move
-                                              }),
-                               pPawnMovesVector.end());
-    }
-}
-
-auto ChessModel::simulatesCheck(PawnModel *pChosenPawn, const BoardPosition &move) -> bool {
-    // Simulate the move
-    auto originalPosition = pChosenPawn->pwnBPosition;
-    pChosenPawn->pwnBPosition = move;
-
-    // Temporarily remove any piece that might be captured by the move
-    PawnModel *capturedPiece = nullptr;
-    int capturedPieceIndex = -1;
-    removePieceAt(move, capturedPiece, capturedPieceIndex);
-
-    // Check if the king is in check after the move
-    bool isKingInCheck = isKingAttacked();
-
-    // Undo the move
-    pChosenPawn->pwnBPosition = originalPosition;
-
-    // Restore the captured piece if there was one
-    restorePiece(capturedPiece, capturedPieceIndex);
-
-    return isKingInCheck;
-}
-
-auto ChessModel::removePieceAt(const BoardPosition &position, PawnModel *&capturedPiece, int &capturedPieceIndex) -> void {
-    for (int i = 0; i < pieces.size(); ++i) {
-        if (reinterpret_cast<const quint8 *>(pieces.at(i)->pwnBPosition.posX) == &position.posX &&
-            reinterpret_cast<const quint8 *>(pieces.at(i)->pwnBPosition.posY) == &position.posY) {
-            capturedPiece = pieces.at(i);
-            capturedPieceIndex = i;
-            pieces.removeAt(i);
-            break;
+            if (pieces.at(i)->pwnBPosition.posX == move.posX && pieces.at(i)->pwnBPosition.posY == move.posY &&
+                pieces.at(i) != pChosenPawn && pieces.at(i)->isWhite != isWhitePlayerTurn) {
+                capturedPiece = pieces.at(i);
+                capturedPieceIndex = i;
+                pieces.removeAt(i);
+                break;
+            }
         }
-    }
-}
+        // Check if the king is in check after the move
+        bool isKingInCheck = isWhitePlayerTurn ?
+                             isCellAttacked(whiteKing->pwnBPosition.posX, whiteKing->pwnBPosition.posY) :
+                             isCellAttacked(blackKing->pwnBPosition.posX, blackKing->pwnBPosition.posY);
+        // Undo the move
+        pChosenPawn->pwnBPosition = correctPosition;
 
-auto ChessModel::restorePiece(PawnModel *capturedPiece, int capturedPieceIndex) -> void {
-    if (capturedPiece && capturedPieceIndex != -1) {
-        pieces.insert(capturedPieceIndex, capturedPiece);
-    }
+        // Restore the captured piece if there was one
+        if (capturedPiece && capturedPieceIndex != -1) {
+            pieces.insert(capturedPieceIndex, capturedPiece);
+        }
+        return isKingInCheck;
+    }), pPawnMovesVector.end());
 }
 
 auto ChessModel::performCastling(quint8 x) -> void {
