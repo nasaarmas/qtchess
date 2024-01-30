@@ -27,19 +27,26 @@ public:
 
     [[nodiscard]] auto getDeadPieces() const -> QList<PawnModel *>;
 
-    [[nodiscard]] auto getMovesVector() const -> QVector<BoardPosition>;
+    auto getMovesVector() -> QVector<BoardPosition>;
 
     auto ChangePiecePlace(quint8 x, quint8 y) -> void;
 
     auto startGame() -> void;
 
+    auto isWhiteTurn() -> bool;
+
+    void popCurrentPieceFromMoves();
+
     auto isPieceSelected() -> bool;
+
 
     auto getPieceClicked(quint8 column, quint8 row) -> void;
 
     auto isCellAttacked(quint8 column, quint8 row) -> bool;
 
     auto isMate() -> bool;
+
+    void stopGame();
 
     ~ChessModel();
 
@@ -59,6 +66,8 @@ private:
     PawnModel *currentlySelectedPawn;
     int fontSize, lftBrdPadding, topBrdPadding, cellSize;
     bool isGameOn;
+
+
 };
 
 #endif //QTCHESS_PJC_CHESSMODEL_H

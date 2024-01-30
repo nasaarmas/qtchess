@@ -216,3 +216,7 @@ auto QueenModel::ValidateMove(int x, int y) -> bool {
     return (std::abs(x - int{pwnBPosition.posX}) == std::abs(y - int{pwnBPosition.posY})) ||
             (x == int{pwnBPosition.posX} || y == int{pwnBPosition.posY});
 }
+
+auto QueenModel::CleanUp() -> bool {
+    return false;
+}

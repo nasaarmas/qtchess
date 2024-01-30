@@ -16,12 +16,6 @@ ChessModel::ChessModel() {
     isGameOn = false;
 }
 
-ChessModel::~ChessModel() {
-    for (PawnModel *piece: this->pieces) {
-        delete piece;
-    }
-    pieces.clear();
-}
 
 auto ChessModel::getLftPadding() const -> int {
     return lftBrdPadding;
@@ -47,18 +41,19 @@ auto ChessModel::getDeadPieces() const -> QList<PawnModel *> {
     return deadPieces;
 }
 
-auto ChessModel::getMovesVector() const -> QVector<BoardPosition> {
+auto ChessModel::getMovesVector() -> QVector<BoardPosition> {
+    if (currentlySelectedPawn) {
+        pPawnMovesVector.append(currentlySelectedPawn->pwnBPosition);
+    }
     return pPawnMovesVector;
 }
 
 auto ChessModel::ChangePiecePlace(quint8 x, quint8 y) -> void {
-    if (!pPawnMovesVector.isEmpty()) {
-        pPawnMovesVector.pop_back();
-    }
 
     bool canMove = false;
     for (const auto &move: pPawnMovesVector) {
         if (move.posX == x && move.posY == y) {
+
             canMove = true;
             break;
         }
@@ -93,6 +88,24 @@ auto ChessModel::ChangePiecePlace(quint8 x, quint8 y) -> void {
                 }
             }
         }
+        if (currentlySelectedPawn->isUpgradable) {
+            if (currentlySelectedPawn->isWhite) {
+                auto newQueen = new QueenModel(currentlySelectedPawn->pwnBPosition, ":/pieces-png/white-queen.png");
+                pieces.append(newQueen);
+            } else {
+                auto newQueen = new QueenModel(currentlySelectedPawn->pwnBPosition, ":/pieces-png/black-queen.png",
+                                               false);
+                pieces.append(newQueen);
+            }
+            auto deletePawn = std::find(pieces.begin(), pieces.end(), currentlySelectedPawn);
+            if (deletePawn != pieces.end()) {
+                // Delete the object
+                delete *deletePawn;
+
+                // Remove the pointer to the object from the list
+                pieces.erase(deletePawn);
+            }
+        }
         // Switch the turn
         isWhitePlayerTurn = !isWhitePlayerTurn;
         currentlySelectedPawn = nullptr;
@@ -105,6 +118,10 @@ auto ChessModel::ChangePiecePlace(quint8 x, quint8 y) -> void {
 
 auto ChessModel::startGame() -> void {
     isGameOn = true;
+}
+
+auto ChessModel::stopGame() -> void {
+    isGameOn = false;
 }
 
 auto ChessModel::isPieceSelected() -> bool {
@@ -120,14 +137,14 @@ auto ChessModel::getPieceClicked(quint8 column, quint8 row) -> void {
         if (piece->pwnBPosition.posX == column && piece->pwnBPosition.posY == row &&
             piece->isWhite == isWhitePlayerTurn) {
             if (currentlySelectedPawn == piece) {
-                currentlySelectedPawn = nullptr;
-                return;
+                break;
             }
             currentlySelectedPawn = piece;
             updateMoveVector(piece);
             return;
         }
     }
+    currentlySelectedPawn = nullptr;
 }
 
 auto ChessModel::isCellAttacked(quint8 column, quint8 row) -> bool {
@@ -307,73 +324,27 @@ auto ChessModel::isCellAttacked(quint8 column, quint8 row) -> bool {
             if (column + knightMovesX[i] == pawn->pwnBPosition.posX &&
                 row + knightMovesY[i] == pawn->pwnBPosition.posY) {
                 if (isWhitePlayerTurn != pawn->isWhite && pawn->ValidateMove(int(column), int(row))) {
-
                     return true;
-
                 }
-                breakOuterLoop = true;
-                break;
             }
-        }
-        if (breakOuterLoop) {
-            break;
         }
     }
     return false;
 }
 
 auto ChessModel::isMate() -> bool {
-    PawnModel *currentKing = isWhitePlayerTurn ? whiteKing : blackKing;
-    QVector<BoardPosition> tempMoves = {};
-    currentKing->PossibleMoves(&tempMoves, pieces);
-
-    // Check if the king can move out of the check
-    auto correctPosition = currentKing->pwnBPosition;
-    tempMoves.erase(std::remove_if(tempMoves.begin(), tempMoves.end(), [&](const auto &move) {
-        currentKing->pwnBPosition = move;
-        auto attacked = isCellAttacked(currentKing->pwnBPosition.posX, currentKing->pwnBPosition.posY);
-        currentKing->pwnBPosition = correctPosition;
-        return attacked;
-    }), tempMoves.end());
-
-    if (!tempMoves.isEmpty() || !isCellAttacked(currentKing->pwnBPosition.posX, currentKing->pwnBPosition.posY)) {
-        return false; // King can move to a safe position or is not in check
-    }
-
-    // Check if any piece can block the check or capture the threatening piece
+    auto tempMoves = pPawnMovesVector;
     for (auto *piece: pieces) {
         if (piece->isWhite == isWhitePlayerTurn) {
-            QVector<BoardPosition> pieceMoves = {};
-            piece->PossibleMoves(&pieceMoves, pieces);
-            for (const auto &move: pieceMoves) {
-                auto originalPosition = piece->pwnBPosition;
-                piece->pwnBPosition = move;
-
-                // Simulate capturing an opponent's piece
-                PawnModel *capturedPiece = nullptr;
-                auto it = std::find_if(pieces.begin(), pieces.end(), [move](const PawnModel *otherPiece) {
-                    return otherPiece->pwnBPosition.posX == move.posX && otherPiece->pwnBPosition.posY == move.posY;
-                });
-                if (it != pieces.end() && (*it)->isWhite != isWhitePlayerTurn) {
-                    capturedPiece = *it;
-                    pieces.erase(it);
-                }
-                auto kingIsAttacked = isCellAttacked(currentKing->pwnBPosition.posX, currentKing->pwnBPosition.posY);
-                // Undo the move and restore captured piece if any
-                piece->pwnBPosition = originalPosition;
-                if (capturedPiece) {
-                    pieces.push_back(capturedPiece);
-                }
-                if (!kingIsAttacked) {
-                    return false; // A piece can block the check or capture the threatening piece
-                }
+            updateMoveVector(piece);
+            if (!pPawnMovesVector.isEmpty()) {
+                pPawnMovesVector = tempMoves;
+                return false;
             }
         }
     }
-
-    qDebug() << "Game over: " << (isWhitePlayerTurn ? "Black wins" : "White wins");
-    isGameOn = false;
-    return true; // Checkmate
+    pPawnMovesVector = tempMoves;
+    return true;
 }
 
 auto ChessModel::initializePieces(QList<PawnModel *> &allPieces, PawnModel *&whiteKing, PawnModel *&blackKing) -> void {
@@ -453,22 +424,25 @@ auto ChessModel::initializePieces(QList<PawnModel *> &allPieces, PawnModel *&whi
 }
 
 auto ChessModel::updateMoveVector(PawnModel *pChosenPawn) -> void {
-    if (!pPawnMovesVector.empty()) {
+    if (!pPawnMovesVector.isEmpty()) {
         pPawnMovesVector.clear();
     }
 
     pChosenPawn->PossibleMoves(&pPawnMovesVector, pieces);
-    auto correctPosition = currentlySelectedPawn->pwnBPosition;
+    auto correctPosition = pChosenPawn->pwnBPosition;
     pPawnMovesVector.erase(std::remove_if(pPawnMovesVector.begin(), pPawnMovesVector.end(), [&](const auto &move) {
         // Simulate the move
-        currentlySelectedPawn->pwnBPosition = move;
+        pChosenPawn->pwnBPosition = move;
         // Find if there is a piece at the move position and temporarily remove it
         PawnModel *capturedPiece = nullptr;
-        for (auto it = pieces.begin(); it != pieces.end(); ++it) {
-            if ((*it)->pwnBPosition.posX == move.posX && (*it)->pwnBPosition.posY == move.posY &&
-                *it != currentlySelectedPawn) {
-                capturedPiece = *it;
-                pieces.erase(it);
+        int capturedPieceIndex = -1;
+        for (auto i = int{0}; i < pieces.size(); i++) {
+
+            if (pieces.at(i)->pwnBPosition.posX == move.posX && pieces.at(i)->pwnBPosition.posY == move.posY &&
+                pieces.at(i) != pChosenPawn && pieces.at(i)->isWhite != isWhitePlayerTurn) {
+                capturedPiece = pieces.at(i);
+                capturedPieceIndex = i;
+                pieces.removeAt(i);
                 break;
             }
         }
@@ -477,16 +451,16 @@ auto ChessModel::updateMoveVector(PawnModel *pChosenPawn) -> void {
                              isCellAttacked(whiteKing->pwnBPosition.posX, whiteKing->pwnBPosition.posY) :
                              isCellAttacked(blackKing->pwnBPosition.posX, blackKing->pwnBPosition.posY);
         // Undo the move
-        currentlySelectedPawn->pwnBPosition = correctPosition;
+        pChosenPawn->pwnBPosition = correctPosition;
 
         // Restore the captured piece if there was one
-        if (capturedPiece) {
-            pieces.push_back(capturedPiece);
+        if (capturedPiece && capturedPieceIndex != -1) {
+            pieces.insert(capturedPieceIndex, capturedPiece);
         }
         return isKingInCheck;
     }), pPawnMovesVector.end());
 
-    pPawnMovesVector.append(currentlySelectedPawn->pwnBPosition);
+
 }
 
 auto ChessModel::clearEnPassants() -> void {
@@ -497,7 +471,27 @@ auto ChessModel::clearEnPassants() -> void {
     }
 }
 
+ChessModel::~ChessModel() {
+    for (auto *piece: pieces) {
+        delete piece;
+    }
+    pieces.clear();
 
+    for (auto *piece: deadPieces) {
+        delete piece;
+    }
+    deadPieces.clear();
+}
+
+auto ChessModel::isWhiteTurn() -> bool {
+    return isWhitePlayerTurn;
+}
+
+auto ChessModel::popCurrentPieceFromMoves() -> void {
+    if (!pPawnMovesVector.isEmpty()) {
+        pPawnMovesVector.pop_back();
+    }
+}
 
 
 

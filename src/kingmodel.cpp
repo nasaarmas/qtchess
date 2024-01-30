@@ -48,3 +48,7 @@ auto KingModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<Pa
 auto KingModel::ValidateMove(int x, int y) -> bool {
     return std::abs(x - int{pwnBPosition.posX}) <= 1 && std::abs(y - int{pwnBPosition.posY}) <= 1;
 }
+
+auto KingModel::CleanUp() -> bool {
+    return false;
+}

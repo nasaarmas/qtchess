@@ -115,3 +115,7 @@ auto RookModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<Pa
 auto RookModel::ValidateMove(int x, int y) -> bool {
     return x == int{pwnBPosition.posX} || y == int{pwnBPosition.posY};
 }
+
+auto RookModel::CleanUp() -> bool {
+    return false;
+}

@@ -6,6 +6,7 @@ PawnModel::PawnModel(BoardPosition pwnBPosition, QString imagePath, bool isWhite
         pwnBPosition(pwnBPosition), imagePath(std::move(imagePath)), isWhite(isWhite) {
     this->isFirstMove = true;
     this->allowSpecialMove = {};
+    isUpgradable = false;
 }
 
 auto PawnModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<PawnModel *> &pieces) -> void {
@@ -89,6 +90,9 @@ auto PawnModel::CleanUp() -> bool {
     if (isFirstMove) {
         isFirstMove = false;
         return true;
+    }
+    if (pwnBPosition.posY == 0 || pwnBPosition.posY == 7) {
+        isUpgradable = true;
     }
     return false;
 }

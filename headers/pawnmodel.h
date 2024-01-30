@@ -19,6 +19,7 @@ public:
 
     virtual ~PawnModel() = default;
 
+    bool isUpgradable;
     BoardPosition pwnBPosition;
     QString imagePath;
     bool isWhite;

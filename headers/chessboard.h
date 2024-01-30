@@ -23,14 +23,14 @@ public:
 
     auto updateCircles(QVector<BoardPosition> currentCircles) -> void;
 
+    static auto exitGame() -> void;
+
+    auto setInfoString(QString newInfo) -> void;
+
     ~ChessBoard() override;
 
     QRect startGameButton;
-
     QRect exitButton;
-
-    static auto exitGame() -> void;
-
     bool isHoveringStartGameButton;
     bool isHoveringExitButton;
 
@@ -48,6 +48,7 @@ protected:
 private:
     static auto printPawn(PawnModel *pawn, QPainter &painter) -> void;
 
+    QString infoText;
     QList<PawnModel *> pieces;
     QList<PawnModel *> deadPiecesToDraw;
     QVector<BoardPosition> moveCircles;

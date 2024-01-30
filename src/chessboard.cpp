@@ -17,7 +17,21 @@ ChessBoard::ChessBoard(QWidget *parent, int fontSize, int lftBrdPadding, int top
     isHoveringStartGameButton = false;
     isHoveringExitButton = false;
     moveCircles = {};
+    infoText = "Welcome to my chess!";
 
+}
+
+auto ChessBoard::setCurrentPieces(QList<PawnModel *> currentPieces, QList<PawnModel *> deadPieces) -> void {
+    pieces = std::move(currentPieces);
+    deadPiecesToDraw = std::move(deadPieces);
+}
+
+auto ChessBoard::updateCircles(QVector<BoardPosition> currentCircles) -> void {
+    moveCircles = std::move(currentCircles);
+}
+
+auto ChessBoard::exitGame() -> void {
+    QApplication::quit();
 }
 
 auto ChessBoard::paintEvent(QPaintEvent *) -> void {
@@ -75,41 +89,26 @@ auto ChessBoard::paintEvent(QPaintEvent *) -> void {
     QColor blockColor = isHoveringStartGameButton ? QColor(150, 75, 0) : QColor(110, 46, 19);
     painter.fillRect(startGameButton, blockColor);
     painter.setPen(Qt::white);
-    painter.drawText(startGameButton, Qt::AlignCenter, "Start Game");
+    painter.drawText(startGameButton, Qt::AlignCenter, "(Re)Start Game");
 
     exitButton = QRect(800, 350, 150, 50);
     QColor exitButtonColor = isHoveringExitButton ? QColor(150, 75, 0) : QColor(110, 46, 19);
     painter.fillRect(exitButton, exitButtonColor);
     painter.setPen(Qt::white);
     painter.drawText(exitButton, Qt::AlignCenter, "Exit");
-}
 
-auto ChessBoard::printPawn(PawnModel *pawn, QPainter &painter) -> void {
-    auto pawnToBeDrawn = QPixmap{QString(pawn->imagePath)};
-    auto pawnSize = int{60};
-    pawnToBeDrawn = pawnToBeDrawn.scaled(pawnSize, pawnSize);
-    painter.drawPixmap(195 + 50 * (pawn->pwnBPosition.posX),
-                       144 + 350 - 50 * (pawn->pwnBPosition.posY), pawnToBeDrawn);
-}
+    QFont bigFont("Times New Roman", 20);  // Change "Arial" to your preferred font and "20" to your desired size
+    painter.setFont(bigFont);
+    painter.setPen(Qt::white);  // Set the text color to white
 
+// Define QRects for the bigger text above the buttons
+    QRect startGameTextRect(startGameButton.x() - 50, startGameButton.y() - 60, startGameButton.width()* 2 , 50);
 
-auto ChessBoard::mousePressEvent(QMouseEvent *event) -> void {
-    emit mouseClicked(event->x(), event->y());
-}
+// Draw the text
+    painter.drawText(startGameTextRect, Qt::AlignCenter, infoText);
+    painter.setFont(QFont("Times New Roman", fontSize));
 
 
-ChessBoard::~ChessBoard() {
-    pieces.clear();
-    deadPiecesToDraw.clear();
-}
-
-auto ChessBoard::setCurrentPieces(QList<PawnModel *> currentPieces, QList<PawnModel *> deadPieces) -> void {
-    pieces = std::move(currentPieces);
-    deadPiecesToDraw = std::move(deadPieces);
-}
-
-auto ChessBoard::updateCircles(QVector<BoardPosition> currentCircles) -> void {
-    moveCircles = std::move(currentCircles);
 }
 
 auto ChessBoard::mouseMoveEvent(QMouseEvent *event) -> void {
@@ -157,11 +156,26 @@ auto ChessBoard::leaveEvent(QEvent *event) -> void {
     QWidget::leaveEvent(event);
 }
 
-auto ChessBoard::exitGame() -> void {
-    QApplication::quit();
+auto ChessBoard::mousePressEvent(QMouseEvent *event) -> void {
+    emit mouseClicked(event->x(), event->y());
 }
 
+auto ChessBoard::printPawn(PawnModel *pawn, QPainter &painter) -> void {
+    auto pawnToBeDrawn = QPixmap{QString(pawn->imagePath)};
+    auto pawnSize = int{60};
+    pawnToBeDrawn = pawnToBeDrawn.scaled(pawnSize, pawnSize);
+    painter.drawPixmap(195 + 50 * (pawn->pwnBPosition.posX),
+                       144 + 350 - 50 * (pawn->pwnBPosition.posY), pawnToBeDrawn);
+}
 
+ChessBoard::~ChessBoard() {
+    pieces.clear();
+    deadPiecesToDraw.clear();
+}
+
+auto ChessBoard::setInfoString(QString newInfo) -> void {
+    infoText = newInfo;
+}
 
 
 

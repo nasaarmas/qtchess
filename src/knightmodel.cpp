@@ -62,6 +62,10 @@ auto KnightModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<
 }
 
 auto KnightModel::ValidateMove(int x, int y) -> bool {
-    return ((std::abs(x - int{pwnBPosition.posX}) == 1 && std::abs(y - int{pwnBPosition.posY}) == 2) ||
-            (std::abs(x - int{pwnBPosition.posX}) == 2 && std::abs(y - int{pwnBPosition.posY})));
+    return (((std::abs(x - int{pwnBPosition.posX}) == 1 && std::abs(y - int{pwnBPosition.posY}) == 2)) ||
+            ((std::abs(x - int{pwnBPosition.posX}) == 2 && std::abs(y - int{pwnBPosition.posY}) == 1)));
+}
+
+auto KnightModel::CleanUp() -> bool {
+    return false;
 }

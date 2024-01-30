@@ -15,6 +15,8 @@ public:
     auto PossibleMoves(QVector<BoardPosition> *moveVector, const QList<PawnModel *> &pieces) -> void override;
 
     auto ValidateMove(int x, int y) -> bool override;
+
+    auto CleanUp() -> bool override;
 };
 
 
