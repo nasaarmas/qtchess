@@ -27,6 +27,8 @@ add_executable(qtchess_pjc main.cpp headers/chessboard.h src/chessboard.cpp head
         headers/chessgame.h
         src/chessmodel.cpp
         headers/chessmodel.h
+        headers/stockfishintegration.h
+        src/stockfishintegration.cpp
 )
 target_link_libraries(qtchess_pjc
         Qt5::Core

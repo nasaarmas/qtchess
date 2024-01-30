@@ -117,5 +117,8 @@ auto RookModel::ValidateMove(int x, int y) -> bool {
 }
 
 auto RookModel::CleanUp() -> bool {
+    if (isFirstMove) {
+        isFirstMove = false;
+    }
     return false;
 }

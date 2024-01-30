@@ -6,6 +6,10 @@ ChessGame::ChessGame(QObject *parent) : pChessModel(std::make_unique<ChessModel>
                                         pChessBoard(std::make_unique<ChessBoard>()) {
     pChessBoard->setCurrentPieces(pChessModel->getCurrentPieces(), pChessModel->getDeadPieces());
     QObject::connect(pChessBoard.get(), &ChessBoard::mouseClicked, this, &ChessGame::processMouseClick);
+    /*pStockFish = std::make_unique<StockFishIntegration>("../stockfish.exe") ;
+    std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"; // Starting position
+    std::string bestMove = pStockFish->testBestMove(fen, 1000); // waitTime in milliseconds
+    qDebug() << "Best move: " << QString::fromStdString(bestMove) << Qt::endl;*/
 }
 
 auto ChessGame::processMouseClick(int x, int y) -> void {
@@ -28,22 +32,25 @@ auto ChessGame::processMouseClick(int x, int y) -> void {
             pChessBoard->updateCircles(pChessModel->getMovesVector());
             pChessBoard->setCurrentPieces(pChessModel->getCurrentPieces(), pChessModel->getDeadPieces());
             pChessBoard->update();
-            //pChessModel->popCurrentPieceFromMoves();
+            pChessModel->popCurrentPieceFromMoves();
         }
         pChessBoard->setInfoString((pChessModel->isWhiteTurn() ? "White player turn" : "Black player turn"));
         if (pChessModel->isMate()) {
-            pChessBoard->setInfoString((pChessModel->isWhiteTurn() ? "Black WINS!" : "White WINS!"));
+            if (pChessModel->isKingAttacked()) {
+                pChessBoard->setInfoString((pChessModel->isWhiteTurn() ? "Black WINS!" : "White WINS!"));
+            } else {
+                pChessBoard->setInfoString(("DRAW - stalmate!"));
+            }
             pChessModel->stopGame();
             pChessBoard->update();
-
         }
-
 
     }
     if (pChessBoard->startGameButton.contains(x, y)) {
         pChessModel.reset();
         pChessModel = std::make_unique<ChessModel>();
         pChessBoard->setCurrentPieces(pChessModel->getCurrentPieces(), pChessModel->getDeadPieces());
+        pChessBoard->updateCircles(pChessModel->getMovesVector());
         pChessModel->startGame();
         pChessBoard->setInfoString("White player turn");
         pChessBoard->update();
@@ -51,7 +58,6 @@ auto ChessGame::processMouseClick(int x, int y) -> void {
     if (pChessBoard->exitButton.contains(x, y)) {
         pChessBoard->exitGame();
     }
-
 }
 
 auto ChessGame::showGame() -> void {

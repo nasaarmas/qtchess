@@ -27,18 +27,21 @@ public:
 
     [[nodiscard]] auto getDeadPieces() const -> QList<PawnModel *>;
 
+    [[nodiscard]] auto isWhiteTurn() const -> bool;
+
     auto getMovesVector() -> QVector<BoardPosition>;
 
     auto ChangePiecePlace(quint8 x, quint8 y) -> void;
 
     auto startGame() -> void;
 
-    auto isWhiteTurn() -> bool;
+    auto stopGame() -> void;
 
     void popCurrentPieceFromMoves();
 
     auto isPieceSelected() -> bool;
 
+    auto isKingAttacked() -> bool;
 
     auto getPieceClicked(quint8 column, quint8 row) -> void;
 
@@ -46,7 +49,6 @@ public:
 
     auto isMate() -> bool;
 
-    void stopGame();
 
     ~ChessModel();
 
@@ -54,7 +56,9 @@ private:
     static auto initializePieces(QList<PawnModel *> &allPieces, PawnModel *&whiteKing, PawnModel *&blackKing) -> void;
 
     auto updateMoveVector(PawnModel *pChosenPawn) -> void;
-
+    auto performCastling(quint8 x, quint8 y) -> void;
+    auto PromotePawn() -> void;
+    auto KillAtack(quint8 x, quint8 y) -> void;
     auto clearEnPassants() -> void;
 
     PawnModel *whiteKing;

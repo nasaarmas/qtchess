@@ -27,7 +27,6 @@ auto PawnModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<Pa
                 isWhite != pawn->isWhite) {
                 moveVector->append({pawn->pwnBPosition.posX, pawn->pwnBPosition.posY});
             }
-
             if (pawn->pwnBPosition.posX == pwnBPosition.posX && pawn->pwnBPosition.posY == pwnBPosition.posY + 2 &&
                 isFirstMove) {
                 moveVector->remove(1);
@@ -56,7 +55,6 @@ auto PawnModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<Pa
                 isWhite != pawn->isWhite) {
                 moveVector->append({pawn->pwnBPosition.posX, pawn->pwnBPosition.posY});
             }
-
             if (pawn->pwnBPosition.posX == pwnBPosition.posX && pawn->pwnBPosition.posY == pwnBPosition.posY - 2 &&
                 isFirstMove) {
                 moveVector->remove(1);

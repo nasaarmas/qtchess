@@ -17,7 +17,7 @@ ChessBoard::ChessBoard(QWidget *parent, int fontSize, int lftBrdPadding, int top
     isHoveringStartGameButton = false;
     isHoveringExitButton = false;
     moveCircles = {};
-    infoText = "Welcome to my chess!";
+    infoText = "Welcome to my chess! \nClick start to start game";
 
 }
 
@@ -102,7 +102,7 @@ auto ChessBoard::paintEvent(QPaintEvent *) -> void {
     painter.setPen(Qt::white);  // Set the text color to white
 
 // Define QRects for the bigger text above the buttons
-    QRect startGameTextRect(startGameButton.x() - 50, startGameButton.y() - 60, startGameButton.width()* 2 , 50);
+    QRect startGameTextRect(startGameButton.x() - 50, startGameButton.y() - 100, startGameButton.width()* 2 , 100);
 
 // Draw the text
     painter.drawText(startGameTextRect, Qt::AlignCenter, infoText);

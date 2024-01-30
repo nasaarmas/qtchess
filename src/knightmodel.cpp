@@ -56,6 +56,7 @@ auto KnightModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<
                 pawn->pwnBPosition.posY == moveVector->at(i).posY &&
                 isWhite == pawn->isWhite) {
                 moveVector->remove(i);
+                i--;
             }
         }
     }
