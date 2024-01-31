@@ -31,8 +31,7 @@ public:
 
     QRect startGameButton;
     QRect exitButton;
-    bool isHoveringStartGameButton;
-    bool isHoveringExitButton;
+
 
 protected:
     auto paintEvent(QPaintEvent *event) -> void override;
@@ -53,7 +52,8 @@ private:
     QList<PawnModel *> deadPiecesToDraw;
     QVector<BoardPosition> moveCircles;
     int fontSize, lftBrdPadding, topBrdPadding, cellSize;
-
+    bool isHoveringStartGameButton;
+    bool isHoveringExitButton;
 };
 
 #endif //QTCHESS_PJC_CHESSBOARD_H
