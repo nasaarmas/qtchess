@@ -6,7 +6,7 @@
 #ifndef QTCHESS_PJC_PAWNMODEL_H
 #define QTCHESS_PJC_PAWNMODEL_H
 
-#include "boardposition.h"
+#include "../boardposition.h"
 #include <QVector>
 #include <memory>
 

@@ -14,21 +14,21 @@ find_package(Qt5 COMPONENTS
         Widgets
         REQUIRED)
 
-add_executable(qtchess_pjc main.cpp headers/chessboard.h src/chessboard.cpp headers/pawnmodel.h src/pawnmodel.cpp resources.qrc headers/boardposition.h headers/bishopmodel.h src/bishopmodel.cpp
-        src/rookmodel.cpp
-        headers/rookmodel.h
-        src/knightmodel.cpp
-        headers/queenmodel.h
-        src/queenmodel.cpp
-        headers/kingmodel.h
-        src/kingmodel.cpp
-        src/chessgame.cpp
-        src/chessgame.cpp
-        headers/chessgame.h
-        src/chessmodel.cpp
-        headers/chessmodel.h
-        headers/stockfishintegration.h
-        src/stockfishintegration.cpp
+add_executable(qtchess_pjc main.cpp headers/chessboard/chessboard.h src/chessboard/chessboard.cpp headers/pieces/pawnmodel.h src/pieces/pawnmodel.cpp resources.qrc headers/boardposition.h headers/pieces/bishopmodel.h src/pieces/bishopmodel.cpp
+        src/pieces/rookmodel.cpp
+        headers/pieces/rookmodel.h
+        src/pieces/knightmodel.cpp
+        headers/pieces/queenmodel.h
+        src/pieces/queenmodel.cpp
+        headers/pieces/kingmodel.h
+        src/pieces/kingmodel.cpp
+        src/chessgame/chessgame.cpp
+        src/chessgame/chessgame.cpp
+        headers/chessgame/chessgame.h
+        src/chessmodel/chessmodel.cpp
+        headers/chessmodel/chessmodel.h
+        headers/stockfishintegration/stockfishintegration.h
+        src/stockfishintegration/stockfishintegration.cpp
 )
 target_link_libraries(qtchess_pjc
         Qt5::Core

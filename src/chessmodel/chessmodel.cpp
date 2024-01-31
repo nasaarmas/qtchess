@@ -1,4 +1,4 @@
-#include "../headers/chessmodel.h"
+#include "../../headers/chessmodel/chessmodel.h"
 #include <cctype>
 #include <QDebug>
 

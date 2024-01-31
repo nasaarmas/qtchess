@@ -1,4 +1,4 @@
-#include "../headers/stockfishintegration.h"
+#include "../../headers/stockfishintegration/stockfishintegration.h"
 
 StockFishIntegration::StockFishIntegration(const QString &enginePath) {
     QStringList arguments;  // Create an empty QStringList for the arguments if there are any

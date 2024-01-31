@@ -6,10 +6,10 @@
 #ifndef QTCHESS_PJC_CHESSGAME_H
 #define QTCHESS_PJC_CHESSGAME_H
 
-#include "chessboard.h"
-#include "chessmodel.h"
+#include "../chessboard/chessboard.h"
+#include "../chessmodel/chessmodel.h"
 #include <QObject>
-#include "stockfishintegration.h"
+#include "../stockfishintegration/stockfishintegration.h"
 
 /**
  * @class ChessGame

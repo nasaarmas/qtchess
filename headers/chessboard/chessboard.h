@@ -8,8 +8,8 @@
 
 #include <QWidget>
 #include <QAbstractGraphicsShapeItem>
-#include "pawnmodel.h"
-#include "boardposition.h"
+#include "../pieces/pawnmodel.h"
+#include "../boardposition.h"
 #include <QList>
 #include <QMouseEvent>
 
