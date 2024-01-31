@@ -6,7 +6,7 @@ ChessGame::ChessGame(QObject *parent) : pChessModel(std::make_unique<ChessModel>
                                         pChessBoard(std::make_unique<ChessBoard>()) {
     pChessBoard->setCurrentPieces(pChessModel->getCurrentPieces(), pChessModel->getDeadPieces());
     QObject::connect(pChessBoard.get(), &ChessBoard::mouseClicked, this, &ChessGame::processMouseClick);
-    pStockFish = std::make_unique<StockFishIntegration>("../stockfish.exe");
+    pStockFish = std::make_unique<StockFishIntegration>("../src/stockfishintegration/stockfish.exe");
 }
 
 auto ChessGame::processMouseClick(int x, int y) -> void {
