@@ -1,6 +1,6 @@
 #include <utility>
 
-#include "../headers/knightmodel.h"
+#include "../headers/pieces/knightmodel.h"
 
 
 KnightModel::KnightModel(BoardPosition pwnBPosition, QString imagePath, bool isWhite) : PawnModel(

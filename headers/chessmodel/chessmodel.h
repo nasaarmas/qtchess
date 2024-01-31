@@ -2,12 +2,12 @@
 #define QTCHESS_PJC_CHESSMODEL_H
 
 #include <QList>
-#include "pawnmodel.h"
-#include "bishopmodel.h"
-#include "rookmodel.h"
-#include "knightmodel.h"
-#include "queenmodel.h"
-#include "kingmodel.h"
+#include "pieces/pawnmodel.h"
+#include "pieces/bishopmodel.h"
+#include "pieces/rookmodel.h"
+#include "pieces/knightmodel.h"
+#include "pieces/queenmodel.h"
+#include "pieces/kingmodel.h"
 #include <string>
 
 
