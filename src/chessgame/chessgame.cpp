@@ -1,4 +1,4 @@
-#include "../headers/chessgame.h"
+#include "../../headers/chessgame/chessgame.h"
 #include "QDebug"
 
 

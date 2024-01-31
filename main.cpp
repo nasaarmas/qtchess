@@ -1,5 +1,5 @@
 #include <QApplication>
-#include "headers/chessgame.h"
+#include "headers/chessgame/chessgame.h"
 
 
 int main(int argc, char *argv[]) {

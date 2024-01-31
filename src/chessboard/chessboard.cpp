@@ -1,5 +1,5 @@
-#include "../headers/chessboard.h"
-#include "../headers/chessgame.h"
+#include "../../headers/chessboard/chessboard.h"
+#include "../../headers/chessgame/chessgame.h"
 #include <QPainter>
 #include <QApplication>
 #include <QBrush>

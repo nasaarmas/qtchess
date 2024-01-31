@@ -2,7 +2,7 @@
 #define QTCHESS_PJC_PAWNMODEL_H
 
 //#include <QtCore/QDebug>
-#include "boardposition.h"
+#include "../boardposition.h"
 #include <QVector>
 #include <memory>
 

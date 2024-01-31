@@ -1,4 +1,4 @@
-#include "../headers/pawnmodel.h"
+#include "../../headers/pieces/pawnmodel.h"
 #include <QDebug>
 #include <utility>
 

@@ -1,5 +1,5 @@
 #include <utility>
-#include "../headers/kingmodel.h"
+#include "../../headers/pieces/kingmodel.h"
 #include <QDebug>
 
 

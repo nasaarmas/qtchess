@@ -1,7 +1,7 @@
 #include <utility>
 #include <QList>
 
-#include "../headers/bishopmodel.h"
+#include "../../headers/pieces/bishopmodel.h"
 
 BishopModel::BishopModel(BoardPosition pwnBPosition, QString imagePath, bool isWhite) : PawnModel(
         pwnBPosition, std::move(imagePath), isWhite) {};
@@ -19,10 +19,8 @@ auto BishopModel::PossibleMoves(QVector<BoardPosition> *moveVector, const QList<
                     }
                     breakOuterLoop = true;
                     break;
-
                 }
             }
-
         } else {
             break;
         }

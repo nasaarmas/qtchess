@@ -1,6 +1,6 @@
 #include <utility>
 
-#include "../headers/queenmodel.h"
+#include "../../headers/pieces/queenmodel.h"
 
 
 QueenModel::QueenModel(BoardPosition pwnBPosition, QString imagePath, bool isWhite) : PawnModel(

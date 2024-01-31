@@ -1,6 +1,6 @@
 #include <utility>
 
-#include "../headers/rookmodel.h"
+#include "../../headers/pieces/rookmodel.h"
 
 
 RookModel::RookModel(BoardPosition pwnBPosition, QString imagePath, bool isWhite) : PawnModel(
