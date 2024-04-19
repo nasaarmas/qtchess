@@ -13,7 +13,7 @@ public:
 
     virtual auto PossibleMoves(QVector<BoardPosition> *moveVector, const QList<PawnModel *> &pieces) -> void;
 
-    virtual auto ValidateMove(int x, int y) -> bool;
+    virtual bool ValidateMove(int x, int y);
 
     virtual auto CleanUp() -> bool;
 

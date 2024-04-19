@@ -56,6 +56,7 @@ auto ChessGame::processMouseClick(int x, int y) -> void {
     qDebug() << pChessModel->generateFEN() << Qt::endl;
     QString bestMove = pStockFish->testBestMove(pChessModel->generateFEN(), 1000); // waitTime in milliseconds
     qDebug() << "Best move: " << bestMove << Qt::endl;
+    pChessBoard->updateStockfishMoves(pStockFish->TranslateToBoardPos(bestMove));
 }
 
 auto ChessGame::showGame() -> void {

@@ -61,4 +61,27 @@ auto StockFishIntegration::sendCommand(const QString &command) -> void {
     }
 }
 
+auto StockFishIntegration::TranslateToBoardPos(const QString& suggestedMove) -> QList<BoardPosition> {
+    if (suggestedMove.length() != 4) {
+        // Invalid move format, handle error or return an empty list
+        return QList<BoardPosition>{};
+    }
+
+    auto suggestedPiece = suggestedMove.left(2);
+    auto suggestedMovePlace = suggestedMove.right(2);
+
+    // Assuming chess board is 8x8
+    quint8 column = suggestedPiece.at(0).toLatin1() - 'a';
+    quint8 row = suggestedPiece.at(1).digitValue() - 1;
+
+    auto suggestedMoveList = QList<BoardPosition>{};
+    suggestedMoveList.append({column, row});
+    column = suggestedMovePlace.at(0).toLatin1() - 'a';
+    row = suggestedMovePlace.at(1).digitValue() - 1;
+    suggestedMoveList.append({column, row});
+
+    return suggestedMoveList;
+}
+
+
 

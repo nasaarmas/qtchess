@@ -23,6 +23,8 @@ public:
 
     auto updateCircles(QVector<BoardPosition> currentCircles) -> void;
 
+    auto updateStockfishMoves(QList<BoardPosition> currentStockfishMoves) -> void;
+
     static auto exitGame() -> void;
 
     auto setInfoString(QString newInfo) -> void;
@@ -51,6 +53,7 @@ private:
     QList<PawnModel *> pieces;
     QList<PawnModel *> deadPiecesToDraw;
     QVector<BoardPosition> moveCircles;
+    QList<BoardPosition> stockfishMoves;
     int fontSize, lftBrdPadding, topBrdPadding, cellSize;
     bool isHoveringStartGameButton;
     bool isHoveringExitButton;

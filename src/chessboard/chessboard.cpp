@@ -18,7 +18,7 @@ ChessBoard::ChessBoard(QWidget *parent, int fontSize, int lftBrdPadding, int top
     isHoveringExitButton = false;
     moveCircles = {};
     infoText = "Welcome to my chess! \nClick start to start game";
-
+    stockfishMoves = {};
 }
 
 auto ChessBoard::setCurrentPieces(QList<PawnModel *> currentPieces, QList<PawnModel *> deadPieces) -> void {
@@ -64,6 +64,12 @@ auto ChessBoard::paintEvent(QPaintEvent *) -> void {
         painter.setBrush(Qt::red);
         painter.drawEllipse(lftBrdPadding + cellSize * moveCell.posX + 3,
                             topBrdPadding + 350 - cellSize * moveCell.posY + 3, cellSize - 6, cellSize - 6);
+    }
+
+    for (auto moveSuggestion: stockfishMoves) {
+        painter.setBrush(QColorConstants::Svg::orange);
+        painter.drawEllipse(lftBrdPadding + cellSize * moveSuggestion.posX + 3,
+                            topBrdPadding + 350 - cellSize * moveSuggestion.posY + 3, cellSize - 6, cellSize - 6);
     }
 
     for (auto *piece: pieces) {
@@ -173,6 +179,10 @@ ChessBoard::~ChessBoard() {
 
 auto ChessBoard::setInfoString(QString newInfo) -> void {
     infoText = std::move(newInfo);
+}
+
+auto ChessBoard::updateStockfishMoves(QList<BoardPosition> currentCircles) -> void {
+    stockfishMoves = std::move(currentCircles);
 }
 
 

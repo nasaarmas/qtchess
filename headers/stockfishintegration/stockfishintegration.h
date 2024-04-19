@@ -9,6 +9,7 @@
 #include <memory>
 #include <QProcess>
 #include <QDebug>
+#include "../boardposition.h"
 
 class StockFishIntegration {
 public:
@@ -17,6 +18,8 @@ public:
     auto getOutput(int waitTime) -> QString;
 
     auto testBestMove(const QString &fen, unsigned int waitTime) -> QString;
+
+    auto TranslateToBoardPos(const QString& suggestedMove) -> QList<BoardPosition>;
 
     ~StockFishIntegration();
 
