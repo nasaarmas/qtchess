@@ -15,8 +15,9 @@ This project implements a chess application using C++ and the Qt framework. It i
 
 ## Images of program
 1. Start menu of program
-![img.png](start_menu/img.png)
+![img.png](images/start-menu.png)
 2. Screen from game (yello - stockifsh recommendation)
-![img.png](ss-from-game/img.png)
+![img.png](images/ss-from-game.png)
 3. Example end game
-![img.png](end-game/img.png)
+![img.png](images/end-game.png)
+
